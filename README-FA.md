@@ -39,7 +39,7 @@
 نیازمندی‌ها: Node.js 22+، Rust پایدار، ابزار C++ ویژوال استودیو و WebView2.
 
 ```powershell
-git clone https://github.com/webtanan-sketch/Codex-Switch.git
+git clone --branch feat/windows-account-manager https://github.com/webtanan-sketch/Codex-Switch.git
 cd Codex-Switch
 npm ci
 cargo test --workspace --exclude codex-account-manager

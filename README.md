@@ -144,10 +144,10 @@ The companion reconnects automatically when the manager restarts. It records the
 - Visual Studio 2022 Build Tools with **Desktop development with C++** and a Windows SDK.
 - WebView2 Runtime. See [Tauri's Windows prerequisites](https://v2.tauri.app/start/prerequisites/#windows).
 
-Run in PowerShell:
+The implementation currently lives on `feat/windows-account-manager` while its pull request is under review. Run in PowerShell:
 
 ```powershell
-git clone https://github.com/webtanan-sketch/Codex-Switch.git
+git clone --branch feat/windows-account-manager https://github.com/webtanan-sketch/Codex-Switch.git
 cd Codex-Switch
 npm ci
 cargo test --workspace --exclude codex-account-manager
@@ -219,6 +219,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md). Report b
 - [Codex authentication and credential storage](https://developers.openai.com/codex/auth)
 - [Codex configuration reference](https://developers.openai.com/codex/config-reference)
 - [Codex CLI command reference](https://developers.openai.com/codex/cli/reference)
+- [VS Code process isolation and CLI](https://code.visualstudio.com/docs/configure/command-line#_isolating-vs-code-instances)
 - [VS Code command API](https://code.visualstudio.com/api/references/vscode-api#commands)
 - [Windows DPAPI: CryptProtectData](https://learn.microsoft.com/windows/win32/api/dpapi/nf-dpapi-cryptprotectdata)
 

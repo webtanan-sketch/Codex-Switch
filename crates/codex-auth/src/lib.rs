@@ -44,6 +44,20 @@ impl AuthPayload {
             return Err(AuthError::Invalid);
         }
         let value: Value = serde_json::from_slice(&bytes).map_err(|_| AuthError::Invalid)?;
+        if value
+            .get("OPENAI_API_KEY")
+            .and_then(Value::as_str)
+            .is_some_and(|key| !key.is_empty())
+        {
+            return Err(AuthError::Invalid);
+        }
+        if value
+            .get("auth_mode")
+            .and_then(Value::as_str)
+            .is_some_and(|mode| mode != "chatgpt")
+        {
+            return Err(AuthError::Invalid);
+        }
         let tokens = value
             .get("tokens")
             .filter(|v| v.is_object())
@@ -161,6 +175,15 @@ mod tests {
             parsed.identity,
             AuthPayload::parse(payload("TEST_ONLY_B")).unwrap().identity
         );
+    }
+    #[test]
+    fn api_or_external_auth_cannot_masquerade_as_chatgpt_profile() {
+        let mut value: Value = serde_json::from_slice(&payload("TEST_ONLY")).unwrap();
+        value["OPENAI_API_KEY"] = Value::String("TEST_ONLY_KEY".into());
+        assert!(AuthPayload::parse(serde_json::to_vec(&value).unwrap()).is_err());
+        value["OPENAI_API_KEY"] = Value::Null;
+        value["auth_mode"] = Value::String("ephemeral-test-provider".into());
+        assert!(AuthPayload::parse(serde_json::to_vec(&value).unwrap()).is_err());
     }
     #[test]
     fn shared_workspace_is_not_user_identity() {
