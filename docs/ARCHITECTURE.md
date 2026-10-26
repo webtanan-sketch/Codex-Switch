@@ -22,7 +22,7 @@ The Tauri Rust process owns authentication operations. React receives safe profi
 6. Encrypt the latest active payload into its own vault entry and persist metadata.
 7. If selecting the same account, keep the latest auth bytes and return without replacing them.
 8. Save the old login to `rollback.bin`, then durably write the non-secret transaction journal.
-9. Recheck the active snapshot, write the target into a sibling temporary file, flush, and atomically replace `auth.json` using tempfile's platform implementation.
+9. Recheck the active snapshot, write the target into a sibling temporary file, flush, and atomically replace `auth.json` using `ReplaceFileW` for an existing Windows destination (`MoveFileExW` for creation), and tempfile's atomic persist on Unix.
 10. Re-read and verify target identity and byte digest. Restore the encrypted old payload on verification failure.
 11. Persist active and previous pointers, remove the journal, and broadcast `PROFILE_CHANGED`.
 

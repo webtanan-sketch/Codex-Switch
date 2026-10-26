@@ -169,13 +169,45 @@ fn prepare_atomic_write(path: &Path, bytes: &[u8]) -> Result<tempfile::NamedTemp
 }
 pub fn atomic_write(path: &Path, bytes: &[u8]) -> Result<(), VaultError> {
     let tmp = prepare_atomic_write(path, bytes)?;
-    // persist uses MoveFileExW(REPLACE_EXISTING) on Windows; never delete-then-rename.
-    tmp.persist(path)
-        .map_err(|e| VaultError::Replace(e.error.raw_os_error()))?;
-    #[cfg(unix)]
-    fs::File::open(path.parent().ok_or(VaultError::Storage)?)
-        .and_then(|d| d.sync_all())
-        .map_err(|_| VaultError::Storage)?;
+    #[cfg(windows)]
+    {
+        use std::os::windows::ffi::OsStrExt;
+        use windows_sys::Win32::{
+            Foundation::GetLastError,
+            Storage::FileSystem::{MoveFileExW, ReplaceFileW, MOVEFILE_WRITE_THROUGH},
+        };
+        // Close the staging handle before ReplaceFileW opens it; keep deletion-on-drop.
+        let staging = tmp.into_temp_path();
+        let source: Vec<u16> = staging.as_os_str().encode_wide().chain(Some(0)).collect();
+        let target: Vec<u16> = path.as_os_str().encode_wide().chain(Some(0)).collect();
+        let ok = unsafe {
+            if path.exists() {
+                // ReplaceFileW supports a destination opened with delete sharing and
+                // preserves its DACL. MoveFileExW can reject that case with access denied.
+                ReplaceFileW(
+                    target.as_ptr(),
+                    source.as_ptr(),
+                    std::ptr::null(),
+                    0,
+                    std::ptr::null(),
+                    std::ptr::null(),
+                )
+            } else {
+                MoveFileExW(source.as_ptr(), target.as_ptr(), MOVEFILE_WRITE_THROUGH)
+            }
+        };
+        if ok == 0 {
+            return Err(VaultError::Replace(Some(unsafe { GetLastError() } as i32)));
+        }
+    }
+    #[cfg(not(windows))]
+    {
+        tmp.persist(path)
+            .map_err(|e| VaultError::Replace(e.error.raw_os_error()))?;
+        fs::File::open(path.parent().ok_or(VaultError::Storage)?)
+            .and_then(|d| d.sync_all())
+            .map_err(|_| VaultError::Storage)?;
+    }
     Ok(())
 }
 pub fn save(path: &Path, bytes: &[u8], protector: &dyn Protector) -> Result<(), VaultError> {
@@ -220,5 +252,25 @@ mod atomic_tests {
         atomic_write(&path, b"TEST_ONLY_NEW").unwrap();
         assert_eq!(fs::read(&path).unwrap(), b"TEST_ONLY_NEW");
         assert_eq!(fs::read_dir(dir.path()).unwrap().count(), 1);
+    }
+}
+
+#[cfg(all(test, windows))]
+mod windows_replacement_tests {
+    use super::*;
+    use std::os::windows::fs::OpenOptionsExt;
+    use windows_sys::Win32::Storage::FileSystem::{FILE_SHARE_DELETE, FILE_SHARE_READ};
+    #[test]
+    fn replaces_while_old_auth_is_guarded_against_writes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("active");
+        atomic_write(&path, b"TEST_ONLY_OLD").unwrap();
+        let _guard = fs::OpenOptions::new()
+            .read(true)
+            .share_mode(FILE_SHARE_READ | FILE_SHARE_DELETE)
+            .open(&path)
+            .unwrap();
+        atomic_write(&path, b"TEST_ONLY_NEW").unwrap();
+        assert_eq!(fs::read(&path).unwrap(), b"TEST_ONLY_NEW");
     }
 }
