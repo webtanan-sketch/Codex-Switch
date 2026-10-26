@@ -1,0 +1,57 @@
+name: Validate and build Windows preview
+on:
+  push:
+    branches: [main, 'feat/**']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  core:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --workspace --exclude codex-account-manager --all-targets --locked -- -D warnings
+      - run: cargo test --workspace --exclude codex-account-manager --locked
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run check:secrets
+  windows-preview:
+    needs: [core, frontend]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: npm ci
+      - run: npm run desktop:build
+      - run: npm run extension:package
+      - name: Upload unsigned preview artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-account-manager-windows-preview
+          if-no-files-found: error
+          path: |
+            target/release/bundle/nsis/*-setup.exe
+            apps/vscode-extension/*.vsix
