@@ -1,0 +1,18 @@
+{
+  "name": "codex-account-manager", "displayName": "Codex Account Manager — Companion",
+  "description": "Local companion for Codex Account Manager: active profile status and automatic Codex refresh.",
+  "version": "0.1.0", "publisher": "webtanan", "license": "Apache-2.0",
+  "repository": {"type":"git","url":"https://github.com/webtanan-sketch/Codex-Switch.git"},
+  "engines": {"vscode":"^1.95.0"}, "categories": ["Other"],
+  "extensionKind": ["ui"], "activationEvents": ["onStartupFinished"], "main": "./dist/extension.js",
+  "scripts": {"build":"tsc -p tsconfig.json", "typecheck":"tsc --noEmit -p tsconfig.json", "test":"npm run build && node --test test/*.test.cjs", "package":"npm run build && vsce package --no-dependencies --out codex-account-manager-0.1.0.vsix"},
+  "devDependencies": {"@types/vscode":"^1.95.0","@types/node":"^22.0.0","@vscode/vsce":"^3.6.0"},
+  "contributes": {
+    "commands": [{"command":"codexAccountManager.showStatus","title":"Codex Account Manager: Show Connection Status"},{"command":"codexAccountManager.refreshCodex","title":"Codex Account Manager: Refresh Codex"}],
+    "configuration": {"title":"Codex Account Manager","properties":{
+      "codexAccountManager.autoReloadCodex":{"type":"boolean","default":true,"description":"Restart the extension host after the global account changes. This can interrupt extension tasks."},
+      "codexAccountManager.showStatusBar":{"type":"boolean","default":true,"description":"Show local manager connection and current profile."},
+      "codexAccountManager.debugLogging":{"type":"boolean","default":false,"description":"Write connection categories only; no account credentials or payloads."}
+    }}
+  }
+}

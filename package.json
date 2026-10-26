@@ -1,0 +1,28 @@
+{
+  "name": "@codex-manager/workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Windows Codex account manager and VS Code companion",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "apps/desktop",
+    "apps/vscode-extension",
+    "packages/shared-types"
+  ],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspace ./apps/vscode-extension",
+    "desktop:dev": "cd apps/desktop && tauri dev",
+    "desktop:build": "cd apps/desktop && tauri build",
+    "extension:package": "npm run package --workspace ./apps/vscode-extension",
+    "check:secrets": "node scripts/check-secrets.mjs"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.8.0",
+    "typescript": "^5.9.2"
+  }
+}

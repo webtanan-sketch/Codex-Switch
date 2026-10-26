@@ -1,0 +1,12 @@
+[package]
+name = "vscode-ipc"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+[target.'cfg(windows)'.dependencies]
+profile-vault = { path = "../profile-vault" }
+windows-sys.workspace = true

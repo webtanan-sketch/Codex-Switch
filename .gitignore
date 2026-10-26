@@ -1,0 +1,17 @@
+/target/
+node_modules/
+dist/
+*.vsix
+*.exe
+*.msi
+*.pdb
+.env*
+!.env.example
+**/auth.json
+**/auth.json.*
+**/vault/
+**/state.json
+**/settings.json
+**/login-*/
+*.log
+.DS_Store

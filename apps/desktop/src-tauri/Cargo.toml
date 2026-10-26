@@ -1,0 +1,16 @@
+[package]
+name = "codex-account-manager"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-single-instance = "2"
+account-core = { path = "../../../crates/account-core" }
+codex-auth = { path = "../../../crates/codex-auth" }
+profile-vault = { path = "../../../crates/profile-vault" }
+vscode-ipc = { path = "../../../crates/vscode-ipc" }
+serde.workspace = true
+serde_json.workspace = true
