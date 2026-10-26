@@ -10,3 +10,6 @@ sha2.workspace = true
 [target.'cfg(windows)'.dependencies]
 profile-vault = { path = "../profile-vault" }
 windows-sys.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

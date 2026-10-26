@@ -7,6 +7,12 @@ pub enum VaultError {
     Storage,
     #[error("DPAPI is only available on Windows.")]
     Unsupported,
+    #[error("Windows credential encryption failed (OS code {0}).")]
+    Encryption(u32),
+    #[error("Windows credential decryption failed (OS code {0}).")]
+    Decryption(u32),
+    #[error("Atomic file replacement failed (OS code {0:?}).")]
+    Replace(Option<i32>),
 }
 pub trait Protector: Send + Sync {
     fn protect(&self, plain: &[u8]) -> Result<Vec<u8>, VaultError>;
@@ -66,7 +72,12 @@ fn dpapi(input: &[u8], decrypt: bool) -> Result<Zeroizing<Vec<u8>>, VaultError> 
         }
     };
     if ok == 0 {
-        return Err(VaultError::Storage);
+        let code = unsafe { windows_sys::Win32::Foundation::GetLastError() };
+        return Err(if decrypt {
+            VaultError::Decryption(code)
+        } else {
+            VaultError::Encryption(code)
+        });
     }
     let result = Zeroizing::new(
         unsafe { std::slice::from_raw_parts(out.pbData, out.cbData as usize) }.to_vec(),
@@ -159,7 +170,8 @@ fn prepare_atomic_write(path: &Path, bytes: &[u8]) -> Result<tempfile::NamedTemp
 pub fn atomic_write(path: &Path, bytes: &[u8]) -> Result<(), VaultError> {
     let tmp = prepare_atomic_write(path, bytes)?;
     // persist uses MoveFileExW(REPLACE_EXISTING) on Windows; never delete-then-rename.
-    tmp.persist(path).map_err(|_| VaultError::Storage)?;
+    tmp.persist(path)
+        .map_err(|e| VaultError::Replace(e.error.raw_os_error()))?;
     #[cfg(unix)]
     fs::File::open(path.parent().ok_or(VaultError::Storage)?)
         .and_then(|d| d.sync_all())

@@ -41,7 +41,12 @@ impl Broadcaster {
     pub fn start(&self) -> std::io::Result<()> {
         #[cfg(windows)]
         {
-            windows::start(self.clone())
+            let root = std::env::var_os("APPDATA").ok_or(std::io::ErrorKind::NotFound)?;
+            windows::start(
+                self.clone(),
+                PIPE.to_owned(),
+                &std::path::PathBuf::from(root).join("CodexAccountManager"),
+            )
         }
         #[cfg(not(windows))]
         {
@@ -61,10 +66,8 @@ mod windows {
     };
     // Restrict clients to the current logon user by reusing an owner-only private
     // file's security descriptor. Named pipe remote clients are explicitly rejected.
-    pub fn start(bus: Broadcaster) -> std::io::Result<()> {
-        let root = std::env::var_os("APPDATA").ok_or(std::io::ErrorKind::NotFound)?;
-        let dir = std::path::PathBuf::from(root).join("CodexAccountManager");
-        profile_vault::private_dir(&dir).map_err(|_| std::io::ErrorKind::PermissionDenied)?;
+    pub fn start(bus: Broadcaster, pipe: String, dir: &Path) -> std::io::Result<()> {
+        profile_vault::private_dir(dir).map_err(|_| std::io::ErrorKind::PermissionDenied)?;
         let file: Vec<u16> = dir.as_os_str().encode_wide().chain(Some(0)).collect();
         let mut size = 0;
         unsafe {
@@ -92,7 +95,7 @@ mod windows {
         {
             return Err(std::io::Error::last_os_error());
         }
-        let name: Vec<u16> = OsStr::new(PIPE).encode_wide().chain(Some(0)).collect();
+        let name: Vec<u16> = OsStr::new(&pipe).encode_wide().chain(Some(0)).collect();
         let mut make = move |first: bool| -> std::io::Result<HANDLE> {
             let attributes = SECURITY_ATTRIBUTES {
                 nLength: std::mem::size_of::<SECURITY_ATTRIBUTES>() as u32,
@@ -102,7 +105,7 @@ mod windows {
             let handle = unsafe {
                 CreateNamedPipeW(
                     name.as_ptr(),
-                    PIPE_ACCESS_OUTBOUND
+                    PIPE_ACCESS_DUPLEX
                         | FILE_FLAG_OVERLAPPED
                         | if first {
                             FILE_FLAG_FIRST_PIPE_INSTANCE
@@ -233,5 +236,55 @@ mod tests {
             &bytes.replace("\"version\":1", "\"version\":1,\"auth\":{} ")
         )
         .is_err());
+    }
+}
+
+#[cfg(all(test, windows))]
+mod pipe_tests {
+    use super::*;
+    use std::io::{BufRead, BufReader};
+    #[test]
+    fn duplex_clients_receive_metadata_and_can_reconnect() {
+        let dir = tempfile::tempdir().unwrap();
+        let pipe = format!(
+            r"\\.\pipe\CodexAccountManagerTest-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        );
+        let bus = Broadcaster::default();
+        let event = ProfileEvent {
+            version: 1,
+            kind: "STATUS".into(),
+            home_key: home_key(dir.path()),
+            profile_id: None,
+            profile_name: None,
+            timestamp: 1,
+        };
+        bus.publish(event.clone());
+        windows::start(bus, pipe.clone(), dir.path()).unwrap();
+        for _ in 0..2 {
+            let (send, receive) = std::sync::mpsc::channel();
+            let name = pipe.clone();
+            std::thread::spawn(move || {
+                let result = (|| -> std::io::Result<String> {
+                    let client = std::fs::OpenOptions::new()
+                        .read(true)
+                        .write(true)
+                        .open(name)?;
+                    let mut line = String::new();
+                    BufReader::new(client).read_line(&mut line)?;
+                    Ok(line)
+                })();
+                let _ = send.send(result);
+            });
+            let line = receive
+                .recv_timeout(std::time::Duration::from_secs(5))
+                .unwrap()
+                .unwrap();
+            assert_eq!(serde_json::from_str::<ProfileEvent>(&line).unwrap(), event);
+        }
     }
 }
