@@ -39,7 +39,7 @@
 نیازمندی‌ها: Node.js 22+، Rust پایدار، ابزار C++ ویژوال استودیو و WebView2.
 
 ```powershell
-git clone --branch feat/windows-account-manager https://github.com/webtanan-sketch/Codex-Switch.git
+git clone https://github.com/webtanan-sketch/Codex-Switch.git
 cd Codex-Switch
 npm ci
 cargo test --workspace --exclude codex-account-manager
@@ -58,3 +58,9 @@ npm run extension:package
 نصب‌کننده در `target/release/bundle/nsis` و افزونهٔ `.vsix` در `apps/vscode-extension` ساخته می‌شود. خروجی‌های پیش‌نمایش امضای دیجیتال ندارند. وضعیت تست ویندوز، محدودیت‌ها و کارهای باقی‌مانده در مستندات انگلیسی شفاف درج می‌شوند.
 
 مجوز: [Apache 2.0](LICENSE). این پروژه محصول مستقل وب‌تنان است و محصول رسمی OpenAI یا Microsoft نیست.
+
+## Local EXE build / ساخت محلی
+
+[Build on Windows without GitHub Actions, including ZIP source](docs/BUILD-WINDOWS.md).
+
+The desktop language selector supports Persian (RTL, Shamsi dates) and English (LTR, Gregorian dates). Your selection is saved locally.

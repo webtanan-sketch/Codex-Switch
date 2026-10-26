@@ -1,3 +1,4 @@
+param([switch]$ExecutableOnly)
 $ErrorActionPreference = 'Stop'
 Set-Location (Join-Path $PSScriptRoot '..')
 function Invoke-Checked([string]$Tool, [string[]]$ToolArgs) {
@@ -10,5 +11,6 @@ Invoke-Checked npm @('run', 'typecheck')
 Invoke-Checked npm @('test')
 Invoke-Checked npm @('run', 'check:secrets')
 Invoke-Checked cargo @('test', '--workspace', '--exclude', 'codex-account-manager', '--locked')
-Invoke-Checked npm @('run', 'desktop:build')
+if ($ExecutableOnly) { Invoke-Checked npm @('run', 'desktop:build', '--', '--no-bundle') }
+else { Invoke-Checked npm @('run', 'desktop:build') }
 Invoke-Checked npm @('run', 'extension:package')

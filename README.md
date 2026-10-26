@@ -144,10 +144,10 @@ The companion reconnects automatically when the manager restarts. It records the
 - Visual Studio 2022 Build Tools with **Desktop development with C++** and a Windows SDK.
 - WebView2 Runtime. See [Tauri's Windows prerequisites](https://v2.tauri.app/start/prerequisites/#windows).
 
-The implementation currently lives on `feat/windows-account-manager` while its pull request is under review. Run in PowerShell:
+Run in PowerShell:
 
 ```powershell
-git clone --branch feat/windows-account-manager https://github.com/webtanan-sketch/Codex-Switch.git
+git clone https://github.com/webtanan-sketch/Codex-Switch.git
 cd Codex-Switch
 npm ci
 cargo test --workspace --exclude codex-account-manager
@@ -226,3 +226,9 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md). Report b
 ## License
 
 [Apache License 2.0](LICENSE). OpenAI, ChatGPT, Codex, Visual Studio Code, and related names belong to their respective owners.
+
+## Local EXE build / ساخت محلی
+
+[Build on Windows without GitHub Actions, including ZIP source](docs/BUILD-WINDOWS.md).
+
+The desktop language selector supports Persian (RTL, Shamsi dates) and English (LTR, Gregorian dates). Your selection is saved locally.

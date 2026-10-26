@@ -31,4 +31,4 @@
 - Policy-aware diagnostics for inherited authentication overrides and managed requirements.
 - Stronger same-account multi-process refresh arbitration, if supported by Codex.
 - Automated VS Code Extension Development Host integration tests and accessibility review.
-- Optional English desktop language and custom trusted executable picker.
+- Custom trusted executable picker. Persian/English desktop language selection is implemented.
