@@ -1,0 +1,19 @@
+[package]
+name = "account-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[dependencies]
+codex-auth = { path = "../codex-auth" }
+profile-vault = { path = "../profile-vault" }
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+zeroize.workspace = true
+fs2.workspace = true
+tempfile.workspace = true
+regex = "1"
+[target.'cfg(windows)'.dependencies]
+windows-sys.workspace = true

@@ -1,0 +1,11 @@
+[package]
+name = "profile-vault"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[dependencies]
+zeroize.workspace = true
+thiserror.workspace = true
+tempfile.workspace = true
+[target.'cfg(windows)'.dependencies]
+windows-sys.workspace = true
