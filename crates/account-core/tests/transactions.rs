@@ -65,6 +65,26 @@ fn real_switch_preserves_unknown_bytes() {
     assert_eq!(f.manager.state().unwrap().active_profile_id, Some(b));
 }
 #[test]
+fn usage_is_associated_with_the_actual_login_without_switching_it() {
+    let f = Fixture::new();
+    let (a, b) = f.pair();
+    assert_eq!(f.manager.usage_profile_id().unwrap(), a);
+    let config = fs::read(f.manager.home.join("config.toml")).unwrap();
+    f.write("TEST_B", 2);
+    assert_eq!(f.manager.usage_profile_id().unwrap(), b);
+    assert_eq!(f.manager.state().unwrap().active_profile_id, Some(a));
+    assert_eq!(f.read(), auth("TEST_B", 2));
+    assert_eq!(
+        fs::read(f.manager.home.join("config.toml")).unwrap(),
+        config
+    );
+    f.write("TEST_UNKNOWN", 1);
+    assert!(matches!(
+        f.manager.usage_profile_id(),
+        Err(Error::UnknownActive)
+    ));
+}
+#[test]
 fn refreshed_credentials_are_restored_on_later_switch() {
     let f = Fixture::new();
     let (a, b) = f.pair();

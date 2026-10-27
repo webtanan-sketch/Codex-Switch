@@ -1,6 +1,10 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use account_core::{system, Manager, Profile, Settings};
-use std::{collections::HashMap, path::PathBuf, sync::Arc};
+use account_core::{system, usage::UsageSnapshot, Manager, Profile, Settings};
+use std::{
+    collections::HashMap,
+    path::PathBuf,
+    sync::{Arc, Mutex},
+};
 use tauri::{Emitter, Manager as _};
 use vscode_ipc::{Broadcaster, ProfileEvent};
 struct App {
@@ -8,6 +12,7 @@ struct App {
     bus: Broadcaster,
     user: PathBuf,
     ipc_ready: bool,
+    usage_cache: Mutex<Option<UsageSnapshot>>,
 }
 fn err(e: account_core::Error) -> String {
     e.to_string()
@@ -133,13 +138,45 @@ fn open_code(app: &App, id: &str) -> Result<(), String> {
         .map(PathBuf::from)
         .or_else(system::discover_vscode)
         .ok_or("VS Code executable was not found")?;
-    system::launch_vscode(&exe, &home, &app.manager.hub.join("vscode-data").join(id)).map_err(err)
+    let result = system::launch_vscode(&exe, &home, &app.manager.hub.join("vscode-data").join(id));
+    account_core::audit(&app.manager.root, "launch", result.is_ok());
+    result.map_err(err)
 }
 #[tauri::command]
 async fn open_vscode(handle: tauri::AppHandle, id: String) -> Result<(), String> {
     tauri::async_runtime::spawn_blocking(move || open_code(&handle.state::<App>(), &id))
         .await
         .map_err(|_| "VS Code setup task failed".to_string())?
+}
+#[tauri::command]
+async fn read_usage(handle: tauri::AppHandle) -> Result<UsageSnapshot, String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        let app = handle.state::<App>();
+        let profile_id = app.manager.usage_profile_id().map_err(err)?;
+        let mut cache = app
+            .usage_cache
+            .lock()
+            .map_err(|_| "Usage limits are unavailable".to_string())?;
+        if let Some(cached) = cache.as_ref().filter(|value| {
+            value.profile_id == profile_id
+                && account_core::now().saturating_sub(value.checked_at) < 60
+        }) {
+            return Ok(cached.clone());
+        }
+        let exe = app
+            .manager
+            .settings()
+            .map_err(err)?
+            .codex_path
+            .map(PathBuf::from)
+            .or_else(system::discover_codex)
+            .ok_or("Codex native executable was not found; select codex.exe in Settings")?;
+        let usage = app.manager.read_usage(&exe).map_err(err)?;
+        *cache = Some(usage.clone());
+        Ok(usage)
+    })
+    .await
+    .map_err(|_| "Background operation failed".to_string())?
 }
 #[tauri::command]
 fn begin_login(app: tauri::State<App>) -> Result<String, String> {
@@ -222,6 +259,7 @@ fn main() {
                 bus,
                 user,
                 ipc_ready,
+                usage_cache: Mutex::new(None),
             };
             let state = manager.state()?;
             let p = state
@@ -297,6 +335,7 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             snapshot,
+            read_usage,
             switch_profile,
             import_current,
             configure_file_storage,

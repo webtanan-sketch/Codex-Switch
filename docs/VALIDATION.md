@@ -1,5 +1,32 @@
 # Validation record
 
+## Local Windows update — 0.1.2
+
+Updated on Windows x64, 2026-10-27, to upstream commit `61f5ee7420ff67178f8b35e8cc8883319525a8ec`, preserving the local 0.1.1 fixes. The build includes local changes; the upstream SHA alone does not identify its complete source.
+
+- Rust core suite: 47 tests passed, including the three upstream isolated-extension setup tests and the existing launch-environment regressions.
+- TypeScript type checking and all 7 desktop/companion tests passed.
+- Rust formatting, core Clippy with warnings denied, and the source credential-pattern scan passed.
+- Optimized native x64 desktop compilation and NSIS installer generation passed for version 0.1.2.
+- Existing account-switch and quota UI behavior was preserved during conflict resolution. No real-account switch or installation of 0.1.2 was performed during this build update.
+
+
+## Local Windows update — 0.1.1
+
+Validated on Windows x64, 2026-10-26, with Rust 1.99.1, Node 22.20.0, and native Codex CLI 0.162.0-alpha.17.2:
+
+- Reproduced the inherited `ELECTRON_RUN_AS_NODE` / `NODE_OPTIONS` launch failures with Windows child-process tests; both failed before the fix and passed afterward.
+- Rust core suite: 44 tests passed, including actual Windows DPAPI, guarded replacement, quota parsing/framing, account association, and named-pipe tests.
+- Desktop formatting helpers and companion protocol: 7 tests passed.
+- Moli with `--layout`: quota rendering, setup confirmation/cancel, switching, VS Code action, unavailable quota, wrong-account quota, and late-response protection passed using synthetic metadata only.
+- Moli did not apply the CDP viewport override to its real layout viewport. Edge was used only for 760px/1120px viewport and visual parity checks; both passed without horizontal overflow or JavaScript errors.
+- Real `Code.exe` GUI launch passed using the core launcher, a dedicated user-data directory, and an empty test Codex home. No saved account was selected for that GUI probe.
+- The optional official app-server quota read succeeded for the currently registered login. Identity and `config.toml` remained unchanged; no AI turn, login/logout, or quota-reset action was requested. No account identifiers or authentication data are recorded here.
+- The locally built NSIS installer upgraded the per-user installation from 0.1.0 to 0.1.1. Both saved profiles and encrypted vault files were preserved; an encrypted-profile/settings backup was taken before replacement. The installed executable matches the source build after normalizing Tauri's three-byte NSIS bundle marker.
+- The installed 0.1.1 window was inspected through accessibility: the version, active-account usage panel, weekly limit, reset countdown, and provider-omitted hourly-limit notice were present, with no quota-read error.
+
+This does not establish completed real-account A → B acceptance, concurrent token-rotation behavior, cross-user ACL testing, code signing, or general availability. The companion remains protocol-compatible at 0.1.0.
+
 ## Development environment
 
 - Source development: Linux container, 2026-10-26.

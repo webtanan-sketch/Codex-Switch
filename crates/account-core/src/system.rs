@@ -81,7 +81,7 @@ pub fn discover_codex() -> Option<PathBuf> {
     std::env::var_os("APPDATA")
         .and_then(|base| find(&PathBuf::from(base).join("npm/node_modules/@openai"), 10))
 }
-fn clean_env(cmd: &mut Command) {
+pub(crate) fn clean_env(cmd: &mut Command) {
     // Authentication overrides would defeat profile selection in the child process.
     for key in [
         "OPENAI_API_KEY",
@@ -90,6 +90,14 @@ fn clean_env(cmd: &mut Command) {
         "OPENAI_ACCESS_TOKEN",
         "OPENAI_IDENTITY_TOKEN_FILE",
         "OPENAI_FEDERATION_ISSUER",
+        // Code.exe must start Electron's GUI, not inherit the caller's Node host.
+        "ELECTRON_RUN_AS_NODE",
+        "ELECTRON_NO_ASAR",
+        "NODE_OPTIONS",
+        "NODE_PATH",
+        "VSCODE_IPC_HOOK_CLI",
+        "VSCODE_PID",
+        "VSCODE_CWD",
     ] {
         cmd.env_remove(key);
     }
@@ -199,12 +207,25 @@ pub fn launch_vscode(exe: &Path, home: &Path, data: &Path) -> Result<()> {
             return Err(Error::EditorSetup);
         }
     }
-    editor_command(exe, home, data, &extensions)
+    let mut child = editor_command(exe, home, data, &extensions)
         .arg("--new-window")
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()?;
+    // Spawn success alone used to report a window even when Electron exited
+    // immediately (for example, after inheriting ELECTRON_RUN_AS_NODE).
+    let deadline = std::time::Instant::now() + std::time::Duration::from_millis(800);
+    while std::time::Instant::now() < deadline {
+        if let Some(status) = child.try_wait()? {
+            return if status.success() {
+                Ok(())
+            } else {
+                Err(Error::Launch)
+            };
+        }
+        std::thread::sleep(std::time::Duration::from_millis(50));
+    }
     Ok(())
 }
 pub fn launch_login(exe: &Path, home: &Path) -> Result<()> {
@@ -336,5 +357,50 @@ mod editor_tests {
             .any(|(key, value)| *key == "VSCODE_IPC_HOOK_CLI" && value.is_none()));
         assert!(env.iter().any(|(key, value)| *key == "CODEX_HOME"
             && *value == Some(std::ffi::OsStr::new("account-home"))));
+    }
+}
+
+#[cfg(all(test, windows))]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn child_launch_drops_electron_node_mode() {
+        let shell = std::env::var_os("ComSpec").unwrap_or_else(|| "cmd.exe".into());
+        let mut command = Command::new(shell);
+        command.env("ELECTRON_RUN_AS_NODE", "1").args([
+            "/d",
+            "/c",
+            "if defined ELECTRON_RUN_AS_NODE (exit /b 17) else (exit /b 0)",
+        ]);
+
+        clean_env(&mut command);
+        let status = command.status().expect("run child environment probe");
+
+        assert_eq!(
+            status.code(),
+            Some(0),
+            "Code.exe must not inherit ELECTRON_RUN_AS_NODE, which prevents an editor window from opening"
+        );
+    }
+
+    #[test]
+    fn child_launch_drops_node_options() {
+        let shell = std::env::var_os("ComSpec").unwrap_or_else(|| "cmd.exe".into());
+        let mut command = Command::new(shell);
+        command.env("NODE_OPTIONS", "--tls-max-v1.2").args([
+            "/d",
+            "/c",
+            "if defined NODE_OPTIONS (exit /b 18) else (exit /b 0)",
+        ]);
+
+        clean_env(&mut command);
+        let status = command.status().expect("run child environment probe");
+
+        assert_eq!(
+            status.code(),
+            Some(0),
+            "Code.exe must not inherit NODE_OPTIONS from the account manager's parent process"
+        );
     }
 }

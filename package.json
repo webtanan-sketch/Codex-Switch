@@ -1,6 +1,6 @@
 {
   "name": "@codex-manager/workspace",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "description": "Windows Codex account manager and VS Code companion",
   "license": "Apache-2.0",
@@ -15,7 +15,7 @@
   "scripts": {
     "typecheck": "npm run typecheck --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
-    "test": "npm run test --workspace ./apps/vscode-extension",
+    "test": "npm run test --workspaces --if-present",
     "desktop:dev": "cd apps/desktop && tauri dev",
     "desktop:build": "cd apps/desktop && tauri build",
     "extension:package": "npm run package --workspace ./apps/vscode-extension",

@@ -1,8 +1,9 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {invoke} from "@tauri-apps/api/core";
 import {listen} from "@tauri-apps/api/event";
 import {english, type Language} from "./i18n";
 import type {Snapshot} from "@codex-manager/shared-types";
+import {UsagePanel} from "./UsagePanel";
 export default function App() {
  const [language,setLanguage] = useState<Language>(() => localStorage.getItem("ui-language") === "en" ? "en" : "fa");
  const t = useCallback((text: string) => language === "en" ? (english[text] ?? text) : text,[language]);
@@ -17,6 +18,9 @@ export default function App() {
   const [login,setLogin] = useState<string>();
   const [codePath,setCodePath] = useState("");
   const [codexPath,setCodexPath] = useState("");
+  const [pendingSwitch,setPendingSwitch] = useState<string>();
+  const storageConfirm = useRef<HTMLButtonElement>(null);
+  useEffect(() => { if (pendingSwitch) storageConfirm.current?.focus(); }, [pendingSwitch]);
   const refresh = useCallback(async () => {
     const result = await invoke<Snapshot>("snapshot"); setData(result);
     setCodePath(result.settings.vscodePath ?? result.diagnostics.vscodePath ?? "");
@@ -37,6 +41,15 @@ export default function App() {
   async function startLogin() {
     setBusy(true); setError(""); try { setLogin(await invoke<string>("begin_login")); setNotice(t("ورود را در مرورگر تکمیل کنید و سپس ذخیرهٔ حساب را بزنید.")); } catch(e) { setError(String(e)); } finally { setBusy(false); }
   }
+  async function switchAccount(id: string) {
+    if (data?.diagnostics.storage !== "file") { setPendingSwitch(id); return; }
+    await run("switch_profile",{id},t("حساب تغییر کرد. افزونهٔ همراه VS Code را تازه می‌کند."));
+  }
+  async function enableAndSwitch() {
+    if (!pendingSwitch) return;
+    if (data?.diagnostics.storage !== "file" && !await run("configure_file_storage")) return;
+    if (await run("switch_profile",{id:pendingSwitch},t("حساب تغییر کرد. افزونهٔ همراه VS Code را تازه می‌کند."))) setPendingSwitch(undefined);
+  }
   const state = data?.state;
   const active = state?.profiles.find(p => p.id === state.activeProfileId);
   return <div className="shell">
@@ -44,14 +57,21 @@ export default function App() {
       <p className="side-label">{t("فضای کار شما")}</p><nav aria-label={t("منوی اصلی")}>{[["accounts","◈",t("حساب‌ها"),"Accounts"],["settings","⚙",t("تنظیمات"),"Settings"],["recovery","↺",t("بازیابی"),"Recovery"]].map(([id,icon,label,en]) => <button key={id} aria-current={page === id ? "page" : undefined} onClick={() => setPage(id)}><b>{icon}</b>{t(label)}<small>{language === "fa" ? en : ""}</small></button>)}</nav>
       <div className="privacy"><span className="dot"/>{t("ذخیره‌سازی محلی")}<small>{t("رمزگذاری با حساب ویندوز · DPAPI")}</small></div>
     </aside>
-    <main aria-busy={busy}><header><div><div className="eyebrow" dir="ltr">YOUR ACCOUNTS. ONE PLACE.</div><h1>{page === "accounts" ? t("مدیریت حساب‌های Codex") : page === "settings" ? t("تنظیمات و بررسی سیستم") : t("بازیابی حساب‌ها")}</h1><p>{t("حساب‌های کاری و شخصی، همیشه در دسترس شما.")}</p></div><select aria-label="Language / زبان" value={language} onChange={e => setLanguage(e.target.value as Language)}><option value="fa">فارسی</option><option value="en">English</option></select><span className="version">v0.1.0 · Preview</span></header>
+    <main aria-busy={busy}><header><div><div className="eyebrow" dir="ltr">YOUR ACCOUNTS. ONE PLACE.</div><h1>{page === "accounts" ? t("مدیریت حساب‌های Codex") : page === "settings" ? t("تنظیمات و بررسی سیستم") : t("بازیابی حساب‌ها")}</h1><p>{t("حساب‌های کاری و شخصی، همیشه در دسترس شما.")}</p></div><select aria-label="Language / زبان" value={language} onChange={e => setLanguage(e.target.value as Language)}><option value="fa">فارسی</option><option value="en">English</option></select><span className="version">v0.1.2 · Preview</span></header>
       {error && <div className="alert error" role="alert"><b>{t("عملیات تکمیل نشد")}</b><span dir="auto">{error}</span></div>}
       {notice && <div className="alert success" role="status">{notice}</div>}
+      {pendingSwitch && <section className="alert storage-prompt" aria-label={t("آماده‌سازی تعویض حساب")}>
+        <h2>{t("آماده‌سازی تعویض حساب")}</h2>
+        <p>{t("حساب مقصد:")} <strong>{state?.profiles.find(profile => profile.id === pendingSwitch)?.name}</strong></p>
+        <p>{t("تعویض حساب به ذخیره‌سازی فایل‌محور نیاز دارد. ابتدا از تنظیمات Codex نسخهٔ پشتیبان می‌گیریم، سپس حالت فایل‌محور را فعال و حساب انتخاب‌شده را جایگزین می‌کنیم.")}</p>
+        <div className="actions"><button ref={storageConfirm} className="primary" disabled={busy} onClick={() => void enableAndSwitch()}>{t("فعال‌سازی و تعویض حساب")}</button><button disabled={busy} onClick={() => setPendingSwitch(undefined)}>{t("انصراف")}</button></div>
+      </section>}
       {data?.diagnostics.recoveryPending && <div className="alert error">{t("یک تعویض ناتمام شناسایی شد. از بخش بازیابی استفاده کنید.")}</div>}
       {page === "accounts" && <>
         <section className="active-banner"><span className="active-symbol">↔</span><div><small>{t("حساب فعال · Active account")}</small><h2>{active?.name ?? t("هنوز حسابی انتخاب نشده")}</h2><p>{active ? t("حساب انتخاب‌شده برای محیط اصلی Codex") : t("حساب فعلی را وارد یا حساب جدیدی اضافه کنید.")}</p></div>{active && <span className="badge"><i className="dot"/>{t("فعال")}</span>}</section>
+        {active && <UsagePanel key={active.id} profileId={active.id} language={language} t={t}/>}
         <div className="section-title"><h2>{t("حساب‌های ذخیره‌شده")} <span>{state?.profiles.length ?? 0}</span></h2><button className="primary" disabled={busy} onClick={() => { setPage("add"); setName(""); }}>{t("＋ افزودن حساب")}</button></div>
-        <div className="grid">{state?.profiles.map((p,i) => <article className={`card ${p.id === state.activeProfileId ? "selected" : ""}`} key={p.id}><div className="card-head"><span className={`avatar color-${i%3}`}>{p.name.slice(0,1)}</span><div><h3>{p.name}</h3><span className="email" dir="ltr">{p.identity.email ?? t("حساب ChatGPT")}</span></div>{p.id === state.activeProfileId && <span className="dot"/>}</div><div className="card-meta"><span>{p.identity.plan ?? "ChatGPT"}</span><span>{t("ذخیرهٔ امن · DPAPI")}</span></div><small className="sync">{t("آخرین همگام‌سازی:")} {date(p.lastSyncedAt)}</small><div className="card-actions"><button disabled={busy || p.id === state.activeProfileId || data?.diagnostics.storage !== "file"} onClick={() => void run("switch_profile",{id:p.id},t("حساب تغییر کرد. افزونهٔ همراه VS Code را تازه می‌کند."))}>{p.id === state.activeProfileId ? t("حساب فعال") : t("تعویض حساب")}</button><button disabled={busy} onClick={() => void run("open_vscode",{id:p.id},t("پنجرهٔ مستقل با افزونهٔ Codex آماده شد. افزونهٔ همراه را هم در همین محیط نصب کنید."))}>{t("باز کردن VS Code ↗")}</button></div></article>)}</div>
+        <div className="grid">{state?.profiles.map((p,i) => <article className={`card ${p.id === state.activeProfileId ? "selected" : ""}`} key={p.id}><div className="card-head"><span className={`avatar color-${i%3}`}>{p.name.slice(0,1)}</span><div><h3>{p.name}</h3><span className="email" dir="ltr">{p.identity.email ?? t("حساب ChatGPT")}</span></div>{p.id === state.activeProfileId && <span className="dot"/>}</div><div className="card-meta"><span>{p.identity.plan ?? "ChatGPT"}</span><span>{t("ذخیرهٔ امن · DPAPI")}</span></div><small className="sync">{t("آخرین همگام‌سازی:")} {date(p.lastSyncedAt)}</small><div className="card-actions"><button disabled={busy || p.id === state.activeProfileId} onClick={() => void switchAccount(p.id)}>{p.id === state.activeProfileId ? t("حساب فعال") : t("تعویض حساب")}</button><button disabled={busy} onClick={() => void run("open_vscode",{id:p.id},t("پنجرهٔ مستقل با افزونهٔ Codex آماده شد. افزونهٔ همراه را هم در همین محیط نصب کنید."))}>{t("باز کردن VS Code ↗")}</button></div></article>)}</div>
         {!state?.profiles.length && <section className="empty"><h2>{t("اولین حساب را اضافه کنید")}</h2><p>{t("برای استفاده از حساب فعلی، «وارد کردن حساب فعلی» را انتخاب کنید.")}</p><button disabled={busy} onClick={() => setPage("add")}>{t("شروع کنید ←")}</button></section>}
         <div className="hint">{t("پنجرهٔ مستقل VS Code برای هر حساب با مسیر داده و محیط جدا باز می‌شود.")}</div>
       </>}

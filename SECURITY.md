@@ -2,7 +2,7 @@
 
 ## Supported scope
 
-Version 0.1.0 is a development preview. It has not received an independent security audit or completed real-account Windows acceptance. Use only on a trusted Windows user account.
+The 0.1.x series is a development preview. It has not received an independent security audit or completed real-account Windows acceptance. Use only on a trusted Windows user account.
 
 ## Handling credentials
 

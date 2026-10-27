@@ -10,7 +10,7 @@ A Windows desktop account manager with a VS Code companion. Save your ChatGPT si
 
 </div>
 
-> **Development preview — v0.1.0.** This repository contains the first working implementation and automated tests. A signed, generally available Windows installer and Marketplace listing have **not** been published. Do not interpret source availability or a successful build as completed real-account acceptance testing. See [validation status](docs/VALIDATION.md).
+> **Development preview — v0.1.1.** This repository contains the first working implementation and automated tests. A signed, generally available Windows installer and Marketplace listing have **not** been published. Do not interpret source availability or a successful build as completed real-account acceptance testing. See [validation status](docs/VALIDATION.md).
 >
 > An independent community project by Webtanan. Not affiliated with or endorsed by OpenAI or Microsoft.
 
@@ -88,6 +88,24 @@ CODEX_HOME=%USERPROFILE%\.codex-hub\homes\<profile-id>
 Different user-data directories force separate VS Code environments. The manager now provisions official Codex automatically in an explicit per-account extensions directory before opening the window. First setup requires Marketplace access. Install the companion VSIX into that same environment. See the [offline setup and missing Codex guide](docs/BUILD-WINDOWS.md#codex-missing-from-an-accounts-vs-code-window). Editor settings, sessions, extensions, and Codex configuration are independent; the manager does not automatically copy your global MCP, skills, or project settings. Existing per-profile configuration is preserved when its credential-store setting is updated.
 
 A global switch does not change these isolated windows. The companion's global profile label may remain unset in an isolated window; that window's own Codex session is authoritative. Avoid using the **same** saved account concurrently in global and isolated processes until token-rotation behavior has been validated for your Codex version. Independent account windows are the intended use case.
+
+## Usage limits and switching setup
+
+The active account now shows the remaining quota percentage, the window length reported by Codex, and the next reset date/countdown. A five-hour or weekly window is shown only when Codex actually reports it. Missing quota data is shown as unavailable, never as unused quota. The reset countdown is informational; it does not promise that usage is permitted after that time.
+
+Quota metadata is read through the configured native `codex.exe` using the official [app-server account methods](https://developers.openai.com/codex/app-server): `account/read` with `refreshToken: false`, then `account/rateLimits/read`. The manager does not start an AI turn, log in/out, redeem reset credits, or activate an inactive saved account to inspect it. Normal credential refresh, if needed, remains the official Codex process's responsibility. Reads are cached for one minute; the panel refreshes automatically every five minutes. Account changes and late responses are checked before applying a result.
+
+If file-backed storage is not configured, **Switch account** opens an explicit setup confirmation with the target account name. Confirming backs up `config.toml`, enables file storage through the existing configuration adapter, then switches. Starting the manager or reading quota does not change this setting.
+
+Two optional local diagnostics are available after the usual Windows build prerequisites:
+
+```powershell
+cargo run -p account-core --example usage_check --locked
+# Opens a dedicated, empty VS Code test environment, without selecting a saved account:
+cargo run -p account-core --example launch_check --locked
+```
+
+`usage_check` prints quota metadata and identity/configuration preservation booleans only. Never attach real credentials to test reports.
 
 ## Where data lives
 

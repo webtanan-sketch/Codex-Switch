@@ -1,5 +1,6 @@
 mod service;
 pub mod system;
+pub mod usage;
 use serde::{Deserialize, Serialize};
 pub use service::*;
 use std::{
@@ -33,6 +34,12 @@ pub enum Error {
     Executable,
     #[error("Codex could not be installed in the isolated VS Code environment. Check Marketplace access and your VS Code installation, then retry. For offline setup, install the official openai.chatgpt VSIX into this account environment using the documented command.")]
     EditorSetup,
+    #[error("VS Code could not start. Check its executable path in Settings.")]
+    Launch,
+    #[error("Usage limits are unavailable. Check Codex sign-in and try again shortly.")]
+    UsageUnavailable,
+    #[error("Reading usage limits timed out. Try again shortly.")]
+    UsageTimeout,
     #[error("The login is not complete. Finish Codex login in the opened terminal.")]
     LoginPending,
     #[error("Profile name must have 1–80 characters and no control characters.")]
