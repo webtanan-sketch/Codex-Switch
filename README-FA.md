@@ -2,7 +2,7 @@
 
 با این برنامه می‌توانید حساب‌های ChatGPT/Codex خود را نگه‌داری کنید، حساب فعال را تغییر دهید یا برای هر حساب یک محیط جداگانهٔ VS Code باز کنید.
 
-**پیش‌نمایش نسخهٔ ۰٫۱٫۲ برای Windows x64 منتشر شده است.** این نسخه امضای دیجیتال ندارد و هنوز تعویض واقعی بین دو حساب به‌طور کامل اعتبارسنجی نشده است. پیش از نصب، محدودیت‌ها و هش فایل‌ها را در صفحهٔ انتشار بخوانید.
+**پیش‌نمایش نسخهٔ ۰٫۱٫۲ برای Windows نسخهٔ `x64` منتشر شده است.** این نسخه امضای دیجیتال ندارد و هنوز تعویض واقعی بین دو حساب به‌طور کامل اعتبارسنجی نشده است. پیش از نصب، محدودیت‌ها و هش فایل‌ها را در صفحهٔ انتشار بخوانید.
 
 [دانلود نصب‌کننده](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2-x64-setup.exe) · [دانلود EXE مستقل](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2.exe) · [جزئیات و هش SHA-256](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.2) · [صفحهٔ معرفی برنامه](https://webtanan-sketch.github.io/Codex-Switch/)
 
@@ -40,13 +40,13 @@
 
 ## وضعیت این پیش‌نمایش
 
-خروجی‌های نسخهٔ پیش‌نمایش امضای دیجیتال ندارند و Windows SmartScreen ممکن است دربارهٔ ناشناخته‌بودن ناشر هشدار دهد. هش SHA-256 فایل‌ها در [صفحهٔ نسخهٔ ۰٫۱٫۲](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.2) درج شده است.
+خروجی‌های نسخهٔ پیش‌نمایش امضای دیجیتال ندارند و Windows SmartScreen ممکن است دربارهٔ ناشناخته‌بودن ناشر هشدار دهد. هش `SHA-256` فایل‌ها در [صفحهٔ نسخهٔ ۰٫۱٫۲](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.2) درج شده است.
 
 تست‌های خودکار پروژه اجرا شده‌اند، اما تعویض کامل و واقعی بین دو حساب هنوز تأیید نشده است. پیش از استفاده از حساب‌های مهم، [گزارش اعتبارسنجی](docs/VALIDATION.md) و [سناریوهای پذیرش](tests/ACCEPTANCE.md) را بخوانید.
 
 ## ساخت از سورس
 
-نیازمندی‌ها: Node.js ۲۲ یا بالاتر، Rust پایدار، ابزارهای C++ ویژوال استودیو و WebView2.
+نیازمندی‌ها: Node.js ۲۲ یا بالاتر، Rust پایدار، ابزارهای C++ ویژوال استودیو و `WebView2`.
 
 ```powershell
 git clone https://github.com/webtanan-sketch/Codex-Switch.git
@@ -63,4 +63,4 @@ npm run extension:package
 
 ## مجوز و ارتباط
 
-این پروژه با مجوز [Apache 2.0](LICENSE) منتشر می‌شود و مستقل از OpenAI و Microsoft است.
+این پروژه با مجوز [Apache License `2.0`](LICENSE) منتشر می‌شود و مستقل از OpenAI و Microsoft است.

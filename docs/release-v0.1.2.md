@@ -6,7 +6,7 @@
 
 - [دانلود نصب‌کنندهٔ ویندوز](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2-x64-setup.exe)
 - [دانلود فایل اجرایی مستقل](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2.exe)
-- [مشاهدهٔ هش SHA-256 فایل‌ها](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/SHA256SUMS-0.1.2.txt)
+- [مشاهدهٔ هش `SHA-256` فایل‌ها](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/SHA256SUMS-0.1.2.txt)
 
 پیش از اجرا، هش فایل دریافت‌شده را با فایل `SHA256SUMS-0.1.2.txt` مقایسه کنید. فایل‌ها امضای دیجیتال ندارند؛ ممکن است Windows SmartScreen دربارهٔ ناشناخته‌بودن ناشر هشدار دهد.
 
