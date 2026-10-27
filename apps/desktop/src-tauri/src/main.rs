@@ -136,8 +136,10 @@ fn open_code(app: &App, id: &str) -> Result<(), String> {
     system::launch_vscode(&exe, &home, &app.manager.hub.join("vscode-data").join(id)).map_err(err)
 }
 #[tauri::command]
-fn open_vscode(app: tauri::State<App>, id: String) -> Result<(), String> {
-    open_code(&app, &id)
+async fn open_vscode(handle: tauri::AppHandle, id: String) -> Result<(), String> {
+    tauri::async_runtime::spawn_blocking(move || open_code(&handle.state::<App>(), &id))
+        .await
+        .map_err(|_| "VS Code setup task failed".to_string())?
 }
 #[tauri::command]
 fn begin_login(app: tauri::State<App>) -> Result<String, String> {
@@ -255,9 +257,17 @@ fn main() {
                         }
                     });
                 } else if let Some(profile) = id.strip_prefix("open:") {
-                    if let Err(message) = open_code(&handle.state::<App>(), profile) {
-                        let _ = handle.emit("operation-error", message);
-                    }
+                    let profile = profile.to_owned();
+                    let copy = handle.clone();
+                    tauri::async_runtime::spawn_blocking(move || {
+                        if let Err(message) = open_code(&copy.state::<App>(), &profile) {
+                            let _ = copy.emit("operation-error", message);
+                            if let Some(w) = copy.get_webview_window("main") {
+                                let _ = w.show();
+                                let _ = w.set_focus();
+                            }
+                        }
+                    });
                 }
             })
             .build(handle)?;

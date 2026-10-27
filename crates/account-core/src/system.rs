@@ -94,14 +94,113 @@ fn clean_env(cmd: &mut Command) {
         cmd.env_remove(key);
     }
 }
+const CODEX_EXTENSION: &str = "openai.chatgpt";
+fn editor_command(exe: &Path, home: &Path, data: &Path, extensions: &Path) -> Command {
+    let mut cmd = Command::new(exe);
+    clean_env(&mut cmd);
+    // A terminal opened by VS Code can inherit routing to the original instance.
+    cmd.env_remove("VSCODE_DEV")
+        .env_remove("VSCODE_IPC_HOOK_CLI")
+        .env_remove("ELECTRON_RUN_AS_NODE")
+        .env("CODEX_HOME", home)
+        .arg("--user-data-dir")
+        .arg(data)
+        .arg("--extensions-dir")
+        .arg(extensions);
+    cmd
+}
+fn run_editor_cli(
+    exe: &Path,
+    home: &Path,
+    data: &Path,
+    extensions: &Path,
+    args: &[&str],
+) -> Result<()> {
+    let cli = exe
+        .parent()
+        .ok_or(Error::Executable)?
+        .join("resources/app/out/cli.js");
+    if !cli.is_file() {
+        return Err(Error::EditorSetup);
+    }
+    let mut cmd = Command::new(exe);
+    clean_env(&mut cmd);
+    cmd.env_remove("VSCODE_DEV")
+        .env_remove("VSCODE_IPC_HOOK_CLI")
+        .env("ELECTRON_RUN_AS_NODE", "1")
+        .env("CODEX_HOME", home)
+        .arg(cli)
+        .arg("--user-data-dir")
+        .arg(data)
+        .arg("--extensions-dir")
+        .arg(extensions)
+        .args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        cmd.creation_flags(windows_sys::Win32::System::Threading::CREATE_NO_WINDOW);
+    }
+    let mut child = cmd.spawn().map_err(|_| Error::EditorSetup)?;
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(120);
+    loop {
+        if let Some(status) = child.try_wait().map_err(|_| Error::EditorSetup)? {
+            return if status.success() {
+                Ok(())
+            } else {
+                Err(Error::EditorSetup)
+            };
+        }
+        if std::time::Instant::now() >= deadline {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(Error::EditorSetup);
+        }
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+}
+fn codex_installed(extensions: &Path) -> bool {
+    std::fs::read_dir(extensions)
+        .ok()
+        .into_iter()
+        .flatten()
+        .flatten()
+        .any(|entry| {
+            let manifest = entry.path().join("package.json");
+            let Ok(bytes) = std::fs::read(manifest) else {
+                return false;
+            };
+            let Ok(value) = serde_json::from_slice::<serde_json::Value>(&bytes) else {
+                return false;
+            };
+            value["publisher"]
+                .as_str()
+                .is_some_and(|p| p.eq_ignore_ascii_case("openai"))
+                && value["name"].as_str() == Some("chatgpt")
+        })
+}
 pub fn launch_vscode(exe: &Path, home: &Path, data: &Path) -> Result<()> {
     validate_exe(exe)?;
     profile_vault::private_dir(data)?;
-    let mut cmd = Command::new(exe);
-    clean_env(&mut cmd);
-    cmd.env("CODEX_HOME", home)
-        .args(["--new-window", "--user-data-dir"])
-        .arg(data)
+    let extensions = data.join("extensions");
+    profile_vault::private_dir(&extensions)?;
+    // Register Codex in this exact isolated environment, not the user's default one.
+    if !codex_installed(&extensions) {
+        run_editor_cli(
+            exe,
+            home,
+            data,
+            &extensions,
+            &["--install-extension", CODEX_EXTENSION],
+        )?;
+        if !codex_installed(&extensions) {
+            return Err(Error::EditorSetup);
+        }
+    }
+    editor_command(exe, home, data, &extensions)
+        .arg("--new-window")
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
@@ -171,4 +270,71 @@ pub fn diagnostics(manager: &Manager, user: &Path) -> Result<Diagnostics> {
             && user.join(".codex-switch/profiles").is_dir(),
         recovery_pending: manager.root.join("transaction.json").exists(),
     })
+}
+
+#[cfg(test)]
+mod editor_tests {
+    use super::*;
+    #[test]
+    fn installation_is_checked_by_manifest_not_folder_name() {
+        let dir = tempfile::tempdir().unwrap();
+        let extension = dir.path().join("openai.chatgpt-fake");
+        std::fs::create_dir(&extension).unwrap();
+        assert!(!codex_installed(dir.path()));
+        std::fs::write(
+            extension.join("package.json"),
+            br#"{"publisher":"other","name":"chatgpt"}"#,
+        )
+        .unwrap();
+        assert!(!codex_installed(dir.path()));
+        std::fs::write(
+            extension.join("package.json"),
+            br#"{"publisher":"OpenAI","name":"chatgpt"}"#,
+        )
+        .unwrap();
+        assert!(codex_installed(dir.path()));
+    }
+    #[test]
+    fn setup_failure_does_not_touch_authentication() {
+        let dir = tempfile::tempdir().unwrap();
+        let exe = dir.path().join("Code.exe");
+        std::fs::write(&exe, b"TEST_ONLY_NOT_EXECUTED").unwrap();
+        let home = dir.path().join("home");
+        std::fs::create_dir(&home).unwrap();
+        let auth = home.join("auth.json");
+        std::fs::write(&auth, b"TEST_ONLY_UNCHANGED").unwrap();
+        assert!(matches!(
+            launch_vscode(&exe, &home, &dir.path().join("data")),
+            Err(Error::EditorSetup)
+        ));
+        assert_eq!(std::fs::read(auth).unwrap(), b"TEST_ONLY_UNCHANGED");
+    }
+    #[test]
+    fn launch_keeps_account_and_extension_directories_together() {
+        let cmd = editor_command(
+            Path::new("Code.exe"),
+            Path::new("account-home"),
+            Path::new("account-data"),
+            Path::new("account-data/extensions"),
+        );
+        let args: Vec<_> = cmd
+            .get_args()
+            .map(|v| v.to_string_lossy().to_string())
+            .collect();
+        assert_eq!(
+            args,
+            [
+                "--user-data-dir",
+                "account-data",
+                "--extensions-dir",
+                "account-data/extensions"
+            ]
+        );
+        let env: Vec<_> = cmd.get_envs().collect();
+        assert!(env
+            .iter()
+            .any(|(key, value)| *key == "VSCODE_IPC_HOOK_CLI" && value.is_none()));
+        assert!(env.iter().any(|(key, value)| *key == "CODEX_HOME"
+            && *value == Some(std::ffi::OsStr::new("account-home"))));
+    }
 }

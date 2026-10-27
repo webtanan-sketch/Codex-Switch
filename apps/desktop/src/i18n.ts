@@ -29,7 +29,7 @@ export const english: Record<string,string> = {
   "حساب تغییر کرد. افزونهٔ همراه VS Code را تازه می‌کند.": "Account switched. The companion will refresh VS Code.",
   "حساب فعال": "Active account",
   "تعویض حساب": "Switch account",
-  "پنجرهٔ مستقل VS Code باز شد. افزونه‌های Codex و همراه را در آن نصب کنید.": "Independent VS Code window opened. Install Codex and the companion there.",
+  "پنجرهٔ مستقل با افزونهٔ Codex آماده شد. افزونهٔ همراه را هم در همین محیط نصب کنید.": "Independent VS Code environment is ready with Codex. Install the companion in the same environment.",
   "باز کردن VS Code ↗": "Open VS Code ↗",
   "اولین حساب را اضافه کنید": "Add your first account",
   "برای استفاده از حساب فعلی، «وارد کردن حساب فعلی» را انتخاب کنید.": "To save your existing login, select Import current account.",

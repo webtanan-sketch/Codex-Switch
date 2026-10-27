@@ -75,3 +75,23 @@ npm run desktop:build -- --no-bundle
 برای ساخت نصب‌کننده از `npm run desktop:build` استفاده کنید. نصب‌کننده در `target\release\bundle\nsis` قرار می‌گیرد. برای افزونه، دستور `npm run extension:package` را اجرا کنید. اجرای اول برای دریافت وابستگی‌ها اینترنت می‌خواهد؛ ساخت کاملاً آفلاین نیازمند آماده‌سازی قبلی کش و ابزارها است. خروجی محلی امضای دیجیتال ندارد مگر خودتان آن را امضا کنید.
 
 زبان رابط را از فهرست **فارسی / English** در بالای برنامه انتخاب کنید؛ انتخاب ذخیره می‌شود. فارسی راست‌به‌چپ با تاریخ شمسی و انگلیسی چپ‌به‌راست با تاریخ میلادی است.
+
+## Codex missing from an account's VS Code window
+
+Each account now uses an explicit extension directory:
+`%USERPROFILE%\.codex-hub\vscode-data\<profile-id>\extensions`.
+Before opening it, the manager installs the official `openai.chatgpt` extension with the CLI belonging to the selected Code.exe and that exact user-data/extension pair. The first setup needs Marketplace access; subsequent opens reuse the installed files. Failed setup shows an error instead of silently opening an unprepared environment. Existing account credentials and editor settings are preserved.
+
+For an offline installation, obtain the official Codex VSIX on a connected computer and run the following in PowerShell, replacing the paths/UUID with your account's values. Close that account's VS Code windows first.
+
+```powershell
+$code = 'C:\Users\YOUR_USER\AppData\Local\Programs\Microsoft VS Code\bin\code.cmd'
+$data = "$env:USERPROFILE\.codex-hub\vscode-data\PROFILE_UUID"
+& $code --user-data-dir $data --extensions-dir "$data\extensions" --install-extension 'D:\Downloads\codex.vsix'
+```
+
+Install the manager companion VSIX using the same flags. A companion installed only in the normal environment does not automatically exist in an isolated one.
+
+If Extensions already shows Codex in the **same** account window, check that it is enabled for that profile. Run **View: Open View…** from the Command Palette and select Codex; a hidden Activity Bar icon is distinct from a missing installation. If activation fails, inspect **Developer: Show Running Extensions** and **Output → Log (Extension Host)** locally. Do not share credentials or unsanitized logs. Portable VS Code and custom extension policies need separate validation.
+
+فارسی: در نسخهٔ اصلاح‌شده، افزونهٔ رسمی در مسیر همان حساب نصب و بررسی می‌شود. برای محیط‌های بدون دسترسی به Marketplace از دستور VSIX بالا استفاده کنید. اگر افزونه در همان پنجره نصب و فعال است ولی آیکن دیده نمی‌شود، از «View: Open View…» نمای Codex را باز کنید. افزونهٔ همراه را هم باید با مسیر همان حساب نصب کنید.

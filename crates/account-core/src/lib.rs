@@ -31,6 +31,8 @@ pub enum Error {
     Recovery,
     #[error("Choose a valid executable installed on this computer.")]
     Executable,
+    #[error("Codex could not be installed in the isolated VS Code environment. Check Marketplace access and your VS Code installation, then retry. For offline setup, install the official openai.chatgpt VSIX into this account environment using the documented command.")]
+    EditorSetup,
     #[error("The login is not complete. Finish Codex login in the opened terminal.")]
     LoginPending,
     #[error("Profile name must have 1–80 characters and no control characters.")]

@@ -85,7 +85,7 @@ CODEX_HOME=%USERPROFILE%\.codex-hub\homes\<profile-id>
 --new-window --user-data-dir %USERPROFILE%\.codex-hub\vscode-data\<profile-id>
 ```
 
-Different user-data directories force separate VS Code environments. Install Codex and the companion in each environment. Editor settings, sessions, extensions, and Codex configuration are independent; the manager does not automatically copy your global MCP, skills, or project settings. Existing per-profile configuration is preserved when its credential-store setting is updated.
+Different user-data directories force separate VS Code environments. The manager now provisions official Codex automatically in an explicit per-account extensions directory before opening the window. First setup requires Marketplace access. Install the companion VSIX into that same environment. See the [offline setup and missing Codex guide](docs/BUILD-WINDOWS.md#codex-missing-from-an-accounts-vs-code-window). Editor settings, sessions, extensions, and Codex configuration are independent; the manager does not automatically copy your global MCP, skills, or project settings. Existing per-profile configuration is preserved when its credential-store setting is updated.
 
 A global switch does not change these isolated windows. The companion's global profile label may remain unset in an isolated window; that window's own Codex session is authoritative. Avoid using the **same** saved account concurrently in global and isolated processes until token-rotation behavior has been validated for your Codex version. Independent account windows are the intended use case.
 
