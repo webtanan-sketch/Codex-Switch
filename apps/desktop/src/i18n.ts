@@ -21,6 +21,7 @@ export const english: Record<string,string> = {
   "Codex در حال حاضر محدودیت مصرف این حساب را اعلام کرده است.": "Codex currently reports a usage restriction for this account.",
   "اتصال به برنامه برقرار نشد. نسخهٔ دسکتاپ را اجرا کنید. Desktop connection unavailable.": "Desktop connection unavailable. Start the desktop application.",
   "انجام شد": "Done",
+  "پنجرهٔ VS Code برای این حساب باز شد.": "The VS Code window for this account opened.",
   "ورود را در مرورگر تکمیل کنید و سپس ذخیرهٔ حساب را بزنید.": "Complete sign-in in your browser, then select Save account.",
   "فضای کار شما": "Your workspace",
   "منوی اصلی": "Main navigation",

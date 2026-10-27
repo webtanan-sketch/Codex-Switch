@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "account-core"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "codex-auth",
  "fs2",
@@ -492,7 +492,7 @@ dependencies = [
 
 [[package]]
 name = "codex-account-manager"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "account-core",
  "codex-auth",
@@ -507,7 +507,7 @@ dependencies = [
 
 [[package]]
 name = "codex-auth"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "base64 0.22.1",
  "serde",
@@ -2666,7 +2666,7 @@ dependencies = [
 
 [[package]]
 name = "profile-vault"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "tempfile",
  "thiserror 2.0.21",
@@ -4059,7 +4059,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "vscode-ipc"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "profile-vault",
  "serde",

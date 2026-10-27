@@ -117,19 +117,18 @@ fn editor_command(exe: &Path, home: &Path, data: &Path, extensions: &Path) -> Co
         .arg(extensions);
     cmd
 }
-fn run_editor_cli(
+fn codex_install_command(
     exe: &Path,
     home: &Path,
     data: &Path,
     extensions: &Path,
-    args: &[&str],
-) -> Result<()> {
-    let cli = exe
-        .parent()
-        .ok_or(Error::Executable)?
-        .join("resources/app/out/cli.js");
+) -> Option<Command> {
+    if codex_installed(extensions) {
+        return None;
+    }
+    let cli = exe.parent()?.join("resources/app/out/cli.js");
     if !cli.is_file() {
-        return Err(Error::EditorSetup);
+        return None;
     }
     let mut cmd = Command::new(exe);
     clean_env(&mut cmd);
@@ -142,7 +141,8 @@ fn run_editor_cli(
         .arg(data)
         .arg("--extensions-dir")
         .arg(extensions)
-        .args(args)
+        .arg("--install-extension")
+        .arg(CODEX_EXTENSION)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null());
@@ -151,22 +151,12 @@ fn run_editor_cli(
         use std::os::windows::process::CommandExt;
         cmd.creation_flags(windows_sys::Win32::System::Threading::CREATE_NO_WINDOW);
     }
-    let mut child = cmd.spawn().map_err(|_| Error::EditorSetup)?;
-    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(120);
-    loop {
-        if let Some(status) = child.try_wait().map_err(|_| Error::EditorSetup)? {
-            return if status.success() {
-                Ok(())
-            } else {
-                Err(Error::EditorSetup)
-            };
-        }
-        if std::time::Instant::now() >= deadline {
-            let _ = child.kill();
-            let _ = child.wait();
-            return Err(Error::EditorSetup);
-        }
-        std::thread::sleep(std::time::Duration::from_millis(100));
+    Some(cmd)
+}
+fn try_install_codex_extension(exe: &Path, home: &Path, data: &Path, extensions: &Path) {
+    // Extension setup is best-effort. It must not keep an account's editor window from opening.
+    if let Some(mut command) = codex_install_command(exe, home, data, extensions) {
+        let _ = command.spawn();
     }
 }
 fn codex_installed(extensions: &Path) -> bool {
@@ -194,19 +184,6 @@ pub fn launch_vscode(exe: &Path, home: &Path, data: &Path) -> Result<()> {
     profile_vault::private_dir(data)?;
     let extensions = data.join("extensions");
     profile_vault::private_dir(&extensions)?;
-    // Register Codex in this exact isolated environment, not the user's default one.
-    if !codex_installed(&extensions) {
-        run_editor_cli(
-            exe,
-            home,
-            data,
-            &extensions,
-            &["--install-extension", CODEX_EXTENSION],
-        )?;
-        if !codex_installed(&extensions) {
-            return Err(Error::EditorSetup);
-        }
-    }
     let mut child = editor_command(exe, home, data, &extensions)
         .arg("--new-window")
         .stdin(Stdio::null())
@@ -218,14 +195,16 @@ pub fn launch_vscode(exe: &Path, home: &Path, data: &Path) -> Result<()> {
     let deadline = std::time::Instant::now() + std::time::Duration::from_millis(800);
     while std::time::Instant::now() < deadline {
         if let Some(status) = child.try_wait()? {
-            return if status.success() {
-                Ok(())
-            } else {
-                Err(Error::Launch)
-            };
+            if !status.success() {
+                return Err(Error::Launch);
+            }
+            break;
         }
         std::thread::sleep(std::time::Duration::from_millis(50));
     }
+    // Provision Codex only after the editor has started. Marketplace or installer
+    // failures are best-effort and must never prevent the requested window opening.
+    try_install_codex_extension(exe, home, data, &extensions);
     Ok(())
 }
 pub fn launch_login(exe: &Path, home: &Path) -> Result<()> {
@@ -316,18 +295,18 @@ mod editor_tests {
         assert!(codex_installed(dir.path()));
     }
     #[test]
-    fn setup_failure_does_not_touch_authentication() {
+    fn missing_extension_installer_does_not_block_setup_or_touch_authentication() {
         let dir = tempfile::tempdir().unwrap();
         let exe = dir.path().join("Code.exe");
-        std::fs::write(&exe, b"TEST_ONLY_NOT_EXECUTED").unwrap();
         let home = dir.path().join("home");
         std::fs::create_dir(&home).unwrap();
         let auth = home.join("auth.json");
         std::fs::write(&auth, b"TEST_ONLY_UNCHANGED").unwrap();
-        assert!(matches!(
-            launch_vscode(&exe, &home, &dir.path().join("data")),
-            Err(Error::EditorSetup)
-        ));
+        let data = dir.path().join("data");
+        let extensions = data.join("extensions");
+        profile_vault::private_dir(&extensions).unwrap();
+        assert!(codex_install_command(&exe, &home, &data, &extensions).is_none());
+        try_install_codex_extension(&exe, &home, &data, &extensions);
         assert_eq!(std::fs::read(auth).unwrap(), b"TEST_ONLY_UNCHANGED");
     }
     #[test]

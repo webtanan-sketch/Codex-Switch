@@ -1,3 +1,5 @@
+> This historical preview is superseded by the [current v0.1.3 release](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.3).
+
 # انتشار نسخهٔ ۰٫۱٫۲ برای ویندوز
 
 نسخهٔ پیش‌نمایش Codex Account Manager برای Windows 10/11 نسخهٔ ۶۴ بیتی منتشر شد.

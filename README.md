@@ -10,9 +10,9 @@ A Windows desktop account manager with a VS Code companion. Save your ChatGPT si
 
 </div>
 
-**[Project page](https://webtanan-sketch.github.io/Codex-Switch/) · [Download Windows installer](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2-x64-setup.exe) · [Standalone EXE](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2.exe) · [Release details and SHA-256](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.2)**
+**[Project page](https://webtanan-sketch.github.io/Codex-Switch/) · [Download Windows installer](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3-x64-setup.exe) · [Standalone EXE](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3.exe) · [VS Code companion](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3.vsix) · [Release details and SHA-256](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.3)**
 
-> **Windows preview — v0.1.2.** The installer and standalone executable are unsigned. Real switching between two accounts has not been fully validated; review the [validation status](docs/VALIDATION.md) and the release notes before use.
+> **Windows release — v0.1.3.** The installer and standalone executable are unsigned, so Windows SmartScreen may warn that the publisher is unknown. Verify the SHA-256 checksums on the [release page](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.3).
 >
 > An independent community project by Webtanan. Not affiliated with or endorsed by OpenAI or Microsoft.
 
@@ -38,13 +38,13 @@ A Windows desktop account manager with a VS Code companion. Save your ChatGPT si
 | Login tool | Codex CLI native `codex.exe`, available on `PATH`, found under a standard npm installation, or selected in Settings |
 | Companion | Install the `.vsix` built from this repository |
 
-The manager does not provide Codex access, a subscription, additional quota, or permission to use another person's account. Normal Codex login and service connectivity are still required. API-key, workload-federation, remote SSH, WSL, and dev-container profiles are outside this preview's scope.
+The manager does not provide Codex access, a subscription, additional quota, or permission to use another person's account. Normal Codex login and service connectivity are still required. API-key, workload-federation, remote SSH, WSL, and dev-container profiles are outside the supported scope.
 
 ## Install and start
 
-### Preview build v0.1.2
+### Windows release v0.1.3
 
-Download the [Windows x64 installer](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2-x64-setup.exe) or the [standalone EXE](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2.exe) from the [v0.1.2 release page](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.2). Verify the SHA-256 checksum listed there before running an unsigned preview build.
+Download the [Windows x64 installer](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3-x64-setup.exe), [standalone EXE](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3.exe), or [VS Code companion](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3.vsix) from the [v0.1.3 release page](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.3). Verify the SHA-256 checksum listed there before running the unsigned Windows app.
 
 1. Run the Windows NSIS installer (`*-setup.exe`). Unsigned development builds may trigger Windows SmartScreen; verify the source and checksum before installing.
 2. Start **Codex Account Manager** as your normal Windows user. Administrator access is not needed.
@@ -85,7 +85,7 @@ CODEX_HOME=%USERPROFILE%\.codex-hub\homes\<profile-id>
 --new-window --user-data-dir %USERPROFILE%\.codex-hub\vscode-data\<profile-id>
 ```
 
-Different user-data directories force separate VS Code environments. The manager now provisions official Codex automatically in an explicit per-account extensions directory before opening the window. First setup requires Marketplace access. Install the companion VSIX into that same environment. See the [offline setup and missing Codex guide](docs/BUILD-WINDOWS.md#codex-missing-from-an-accounts-vs-code-window). Editor settings, sessions, extensions, and Codex configuration are independent; the manager does not automatically copy your global MCP, skills, or project settings. Existing per-profile configuration is preserved when its credential-store setting is updated.
+Different user-data directories force separate VS Code environments. The manager opens the requested window first, then tries to install the official Codex extension in that account's extensions directory in the background. A Marketplace or extension-install problem does not block the VS Code window. Install the companion VSIX into that same environment. See the [offline setup and missing Codex guide](docs/BUILD-WINDOWS.md#codex-missing-from-an-accounts-vs-code-window). Editor settings, sessions, extensions, and Codex configuration are independent; the manager does not automatically copy your global MCP, skills, or project settings. Existing per-profile configuration is preserved when its credential-store setting is updated.
 
 A global switch does not change these isolated windows. The companion's global profile label may remain unset in an isolated window; that window's own Codex session is authoritative. Avoid using the **same** saved account concurrently in global and isolated processes until token-rotation behavior has been validated for your Codex version. Independent account windows are the intended use case.
 
@@ -185,7 +185,7 @@ Outputs:
 
 ```text
 target\release\bundle\nsis\*-setup.exe
-apps\vscode-extension\codex-account-manager-0.1.0.vsix
+apps\vscode-extension\codex-account-manager-<version>.vsix
 ```
 
 Use `installer/build.ps1` to run validation and build both artifacts. Production vault operations fail closed on non-Windows platforms. Pure core tests and frontend/extension builds can run on Linux, but they do not replace Windows DPAPI, named-pipe, installer, or real Codex acceptance testing.
@@ -212,7 +212,7 @@ tests/                  Manual real-account acceptance protocol
 
 The test suite covers identity changes, refreshed payloads, unknown-field preservation, atomic replacement, injected interruptions before/after replacement, verification rollback, inter-process locking, invalid/missing auth files, corrupt vaults, isolated homes, login staging, configuration backups, and protocol validation.
 
-Windows tests use real DPAPI. Non-Windows transaction tests inject a **test-only** reversible protector; the shipping application cannot select it. A Windows CI build produces an **unsigned preview** installer and VSIX as Actions artifacts. Release packaging creates a **draft**, never a public release automatically. [Manual real-account acceptance tests](tests/ACCEPTANCE.md) and signing review are required before general distribution.
+Windows tests use real DPAPI. Non-Windows transaction tests inject a **test-only** reversible protector; the shipping application cannot select it. Windows release files are unsigned; the release page publishes SHA-256 checksums. See the [validation record](docs/VALIDATION.md) for automated checks and the maintainer's manual acceptance status.
 
 No workflow requires a ChatGPT token, API key, or personal `auth.json`. Never upload one as a CI secret or artifact for this project's tests.
 

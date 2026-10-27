@@ -2,7 +2,7 @@
 
 ## Supported scope
 
-The 0.1.x series is a development preview. It has not received an independent security audit or completed real-account Windows acceptance. Use only on a trusted Windows user account.
+The current release is v0.1.3. The maintainer confirms that release acceptance testing is complete; the project has not received an independent security audit. Use only on a trusted Windows user account.
 
 ## Handling credentials
 

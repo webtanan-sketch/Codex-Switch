@@ -6,11 +6,11 @@ function Invoke-Checked([string]$Tool, [string[]]$ToolArgs) {
     if ($LASTEXITCODE -ne 0) { throw "$Tool failed ($LASTEXITCODE)" }
 }
 if (-not [System.Environment]::Is64BitOperatingSystem) { throw 'Windows x64 is required.' }
-Invoke-Checked npm @('ci')
-Invoke-Checked npm @('run', 'typecheck')
-Invoke-Checked npm @('test')
-Invoke-Checked npm @('run', 'check:secrets')
+Invoke-Checked npm.cmd @('ci')
+Invoke-Checked npm.cmd @('run', 'typecheck')
+Invoke-Checked npm.cmd @('test')
+Invoke-Checked npm.cmd @('run', 'check:secrets')
 Invoke-Checked cargo @('test', '--workspace', '--exclude', 'codex-account-manager', '--locked')
-if ($ExecutableOnly) { Invoke-Checked npm @('run', 'desktop:build', '--', '--no-bundle') }
-else { Invoke-Checked npm @('run', 'desktop:build') }
-Invoke-Checked npm @('run', 'extension:package')
+if ($ExecutableOnly) { Invoke-Checked npm.cmd @('run', 'desktop:build', '--', '--no-bundle') }
+else { Invoke-Checked npm.cmd @('run', 'desktop:build') }
+Invoke-Checked npm.cmd @('run', 'extension:package')

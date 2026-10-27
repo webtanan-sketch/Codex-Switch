@@ -4,7 +4,7 @@ members = ["crates/*", "apps/desktop/src-tauri"]
 default-members = ["crates/account-core", "crates/codex-auth", "crates/profile-vault", "crates/vscode-ipc"]
 
 [workspace.package]
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 license = "Apache-2.0"
 rust-version = "1.85"

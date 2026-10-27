@@ -7,7 +7,7 @@
   <meta name="description" content="مدیریت محلی حساب‌های Codex در ویندوز؛ تعویض حساب، محیط‌های جداگانهٔ VS Code و مشاهدهٔ محدودیت مصرف حساب فعال.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Codex Switch | مدیریت حساب‌های Codex در ویندوز">
-  <meta property="og:description" content="برای هر حساب Codex، یک فضای کاری مستقل. پیش‌نمایش رایگان و متن‌باز برای ویندوز.">
+  <meta property="og:description" content="برای هر حساب Codex، یک فضای کاری مستقل. مدیریت حساب‌ها و محیط‌های VS Code در ویندوز.">
   <meta property="og:url" content="https://webtanan-sketch.github.io/Codex-Switch/">
   <link rel="canonical" href="https://webtanan-sketch.github.io/Codex-Switch/">
   <link rel="icon" href="../apps/desktop/src-tauri/icons/icon.ico">
@@ -22,7 +22,7 @@
       "operatingSystem": "Windows 10, Windows 11",
       "description": "مدیریت محلی حساب‌های Codex و محیط‌های مستقل VS Code در ویندوز.",
       "url": "https://webtanan-sketch.github.io/Codex-Switch/",
-      "downloadUrl": "https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2-x64-setup.exe",
+      "downloadUrl": "https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3-x64-setup.exe",
       "author": { "@type": "Organization", "name": "Webtanan" },
       "license": "https://www.apache.org/licenses/LICENSE-2.0"
     }
@@ -45,12 +45,13 @@
   <main id="main" class="wrap">
     <section id="top" class="hero">
       <div class="hero-copy">
-        <p class="eyebrow"><span class="status-dot"></span> پیش‌نمایش نسخهٔ ۰٫۱٫۲ <span class="eyebrow-divider">·</span> ویندوز ۱۰ و ۱۱</p>
+        <p class="eyebrow"><span class="status-dot"></span> نسخهٔ ۰٫۱٫۳ <span class="eyebrow-divider">·</span> ویندوز ۱۰ و ۱۱</p>
         <h1>برای هر حساب Codex، <em>یک فضای کاری مستقل.</em></h1>
         <p class="lead">حساب‌های ذخیره‌شده را مدیریت کنید، حساب فعال را عوض کنید یا برای هر حساب، پنجرهٔ جداگانهٔ VS Code باز کنید.</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2-x64-setup.exe">دانلود نصب‌کنندهٔ ویندوز <span aria-hidden="true">←</span></a>
-          <a class="button button-secondary" href="https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.2">جزئیات نسخه و هش فایل</a>
+          <a class="button button-primary" href="https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3-x64-setup.exe">دانلود نصب‌کنندهٔ ویندوز <span aria-hidden="true">←</span></a>
+          <a class="button button-secondary" href="https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.3">جزئیات نسخه و هش فایل</a>
+          <a class="button button-secondary" href="https://github.com/webtanan-sketch/Codex-Switch">اگر برنامه مفید بود، در GitHub ستاره بدهید ★</a>
         </div>
         <p class="hero-note">رایگان و متن‌باز با مجوز Apache، نسخهٔ ۲٫۰ · نصب بدون دسترسی سرپرست ویندوز</p>
       </div>
@@ -73,10 +74,10 @@
       </div>
     </section>
 
-    <section class="release-strip" aria-label="دربارهٔ نسخهٔ پیش‌نمایش">
-      <span class="release-badge">۰٫۱٫۲</span>
+    <section class="release-strip" aria-label="نسخهٔ منتشرشده">
+      <span class="release-badge">۰٫۱٫۳</span>
       <p><strong>نسخهٔ تازه منتشر شده است.</strong> فایل نصب، EXE مستقل و هش <code>SHA-256</code> را در GitHub ببینید.</p>
-      <a href="https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.2">رفتن به صفحهٔ انتشار <span aria-hidden="true">←</span></a>
+      <a href="https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.3">رفتن به صفحهٔ انتشار <span aria-hidden="true">←</span></a>
     </section>
 
     <section id="features" class="section-block">
@@ -94,7 +95,7 @@
         <article class="feature">
           <span class="feature-index">۰۲</span>
           <h3>یک پنجرهٔ VS Code برای هر حساب</h3>
-          <p>داده‌ها، تنظیمات و مسیر Codex هر محیط جداست. برنامه در اولین اجرا افزونهٔ رسمی Codex را در همان محیط آماده می‌کند؛ برای این مرحله دسترسی به Marketplace لازم است.</p>
+          <p>داده‌ها، تنظیمات و مسیر Codex هر محیط جداست. پنجرهٔ VS Code بی‌درنگ باز می‌شود و آماده‌سازی افزونهٔ رسمی Codex در همان محیط، جداگانه در پس‌زمینه انجام می‌گیرد.</p>
         </article>
         <article class="feature">
           <span class="feature-index">۰۳</span>
@@ -122,18 +123,13 @@
         <h2>در چند قدم نصب کنید</h2>
       </div>
       <ol class="steps">
-        <li><span>۱</span><div><strong>نصب‌کننده را دریافت کنید</strong><p>نسخهٔ Windows x64 برای کاربر فعلی نصب می‌شود و به دسترسی مدیر نیاز ندارد.</p></div></li>
+        <li><span>۱</span><div><strong>نصب‌کننده را دریافت کنید</strong><p>نسخهٔ Windows ۱۰/۱۱ x64 برای کاربر فعلی نصب می‌شود و به دسترسی سرپرست نیاز ندارد.</p></div></li>
         <li><span>۲</span><div><strong>مسیر Codex و VS Code را بررسی کنید</strong><p>برنامه مسیرهای نصب‌شده را پیدا می‌کند؛ در صورت نیاز می‌توانید آن‌ها را در تنظیمات انتخاب کنید.</p></div></li>
         <li><span>۳</span><div><strong>حساب‌ها را اضافه و محیط کاری را انتخاب کنید</strong><p>حساب فعلی را وارد کنید یا ورود رسمی Codex را برای حساب دیگری انجام دهید.</p></div></li>
       </ol>
-      <a class="button button-primary" href="https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2-x64-setup.exe">دریافت نسخهٔ ۰٫۱٫۲ <span aria-hidden="true">←</span></a>
-      <a class="button button-secondary" href="https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2.exe">دانلود EXE مستقل</a>
+      <a class="button button-primary" href="https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3-x64-setup.exe">دریافت نسخهٔ ۰٫۱٫۳ <span aria-hidden="true">←</span></a>
+      <a class="button button-secondary" href="https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3.exe">دانلود EXE مستقل</a>
       <p class="install-note">نیازمندی‌ها: Windows ۱۰/۱۱ نسخهٔ <code>x64</code>، VS Code و Codex CLI. فایل‌ها امضای دیجیتال ندارند و ممکن است SmartScreen هشدار دهد. پیش از اجرا، هش فایل را در صفحهٔ Release بررسی کنید.</p>
-    </section>
-
-    <section class="preview-notice">
-      <strong>این نسخه پیش‌نمایش است.</strong>
-      <p>سناریوی واقعی تعویض بین دو حساب هنوز به‌طور کامل تأیید نشده است. برای جزئیات آزمون‌ها و محدودیت‌ها، <a href="https://github.com/webtanan-sketch/Codex-Switch/blob/main/docs/VALIDATION.md">گزارش اعتبارسنجی</a> را بخوانید.</p>
     </section>
 
     <section id="english" class="english-section" lang="en" dir="ltr" aria-labelledby="english-title">
@@ -144,14 +140,15 @@
       </div>
       <div class="english-details">
         <p><strong>Switch with consent.</strong> When file-based credential storage must be enabled, the app backs up Codex settings and asks before changing them.</p>
-        <p><strong>Keep editor environments separate.</strong> Each profile has its own Codex home and VS Code user data. The official Codex extension is provisioned in that environment; initial Marketplace access is required.</p>
+        <p><strong>Keep editor environments separate.</strong> Each profile has its own Codex home and VS Code user data. The official Codex extension is provisioned in the background and does not delay editor launch.</p>
         <p><strong>Read active-account usage.</strong> Quota windows and reset times come from Codex. The app does not activate other saved profiles to query them.</p>
       </div>
       <div class="hero-actions">
-        <a class="button button-primary" href="https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2-x64-setup.exe">Download Windows installer</a>
-        <a class="button button-secondary" href="https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2.exe">Download standalone EXE</a>
+        <a class="button button-primary" href="https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3-x64-setup.exe">Download Windows installer</a>
+        <a class="button button-secondary" href="https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3.exe">Download standalone EXE</a>
+        <a class="button button-secondary" href="https://github.com/webtanan-sketch/Codex-Switch">Star on GitHub</a>
       </div>
-      <p class="install-note">Windows 10/11 x64, VS Code, and Codex CLI are required. Preview build; binaries are unsigned. Real two-account switching is not fully validated. <a href="https://github.com/webtanan-sketch/Codex-Switch">Source and documentation</a>.</p>
+      <p class="install-note">Windows 10/11 x64, VS Code, and Codex CLI are required. The Windows executables are unsigned. <a href="https://github.com/webtanan-sketch/Codex-Switch">Source and documentation</a>.</p>
     </section>
   </main>
 

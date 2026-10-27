@@ -32,8 +32,6 @@ pub enum Error {
     Recovery,
     #[error("Choose a valid executable installed on this computer.")]
     Executable,
-    #[error("Codex could not be installed in the isolated VS Code environment. Check Marketplace access and your VS Code installation, then retry. For offline setup, install the official openai.chatgpt VSIX into this account environment using the documented command.")]
-    EditorSetup,
     #[error("VS Code could not start. Check its executable path in Settings.")]
     Launch,
     #[error("Usage limits are unavailable. Check Codex sign-in and try again shortly.")]

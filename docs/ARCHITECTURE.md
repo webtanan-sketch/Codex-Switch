@@ -34,7 +34,7 @@ Codex does not acquire our operation lock. Denying write sharing and comparing s
 
 A background loop polls every 800 ms. Changed candidates must produce two identical valid reads 80 ms apart. It synchronizes a matching expected identity under the core lock and records its digest only after success. Invalid/locked snapshots are retried. Global and managed isolated auth paths are covered. A refresh updates metadata/UI only and never publishes `PROFILE_CHANGED`.
 
-The first preview does not arbitrate competing refresh rotations for the same account in multiple independent homes. Different accounts in different isolated processes are the supported target scenario. Do not rely on timestamp ordering between multiple writers.
+The manager does not arbitrate competing refresh rotations for the same account in multiple independent homes. Different accounts in different isolated processes are the supported target scenario. Do not rely on timestamp ordering between multiple writers.
 
 ## Isolated process model
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3 — نسخهٔ پایدار Windows
+
+- Fixed the Open VS Code flow so official Codex extension installation runs best-effort after the editor starts; Marketplace or installation failures no longer prevent the requested window from opening.
+- Refreshed the GitHub Pages promotion page with self-hosted Vazirmatn fonts, current release downloads, and clearer Persian copy.
+- Published refreshed Windows installer, standalone executable, VS Code companion, and SHA-256 checksums.
+
 ## 0.1.2 — Local preview update
 
 - Integrated upstream commit 61f5ee7: provision the official Codex extension in each isolated VS Code environment before opening it, with asynchronous setup and actionable installation errors.

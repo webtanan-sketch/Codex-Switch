@@ -2,9 +2,9 @@
 
 با این برنامه می‌توانید حساب‌های ChatGPT/Codex خود را نگه‌داری کنید، حساب فعال را تغییر دهید یا برای هر حساب یک محیط جداگانهٔ VS Code باز کنید.
 
-**پیش‌نمایش نسخهٔ ۰٫۱٫۲ برای Windows نسخهٔ `x64` منتشر شده است.** این نسخه امضای دیجیتال ندارد و هنوز تعویض واقعی بین دو حساب به‌طور کامل اعتبارسنجی نشده است. پیش از نصب، محدودیت‌ها و هش فایل‌ها را در صفحهٔ انتشار بخوانید.
+**نسخهٔ ۰٫۱٫۳ برای Windows نسخهٔ `x64` منتشر شده است.** فایل‌های اجرایی امضای دیجیتال ندارند؛ بنابراین ممکن است Windows SmartScreen دربارهٔ ناشناخته‌بودن ناشر هشدار دهد. پیش از اجرا، هش `SHA-256` را در صفحهٔ انتشار بررسی کنید.
 
-[دانلود نصب‌کننده](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2-x64-setup.exe) · [دانلود EXE مستقل](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2.exe) · [جزئیات و هش SHA-256](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.2) · [صفحهٔ معرفی برنامه](https://webtanan-sketch.github.io/Codex-Switch/)
+[دانلود نصب‌کننده](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3-x64-setup.exe) · [دانلود EXE مستقل](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3.exe) · [افزونهٔ همراه VS Code](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3.vsix) · [جزئیات و هش SHA-256](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.3) · [صفحهٔ معرفی برنامه](https://webtanan-sketch.github.io/Codex-Switch/)
 
 [راهنمای انگلیسی](README.md) · [گزارش اعتبارسنجی](docs/VALIDATION.md) · [معماری](docs/ARCHITECTURE.md) · [بازیابی](docs/RECOVERY.md) · [امنیت](SECURITY.md)
 
@@ -20,7 +20,7 @@
 
 ## نصب و شروع کار
 
-۱. [نصب‌کنندهٔ نسخهٔ ۰٫۱٫۲](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2-x64-setup.exe) را دریافت و اجرا کنید. این نسخه برای Windows 10/11 نسخهٔ ۶۴ بیتی است و برای نصب به دسترسی سرپرست نیاز ندارد.
+۱. [نصب‌کنندهٔ نسخهٔ ۰٫۱٫۳](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.3/codex-account-manager-0.1.3-x64-setup.exe) را دریافت و اجرا کنید. این نسخه برای Windows 10/11 نسخهٔ ۶۴ بیتی است و برای نصب به دسترسی سرپرست نیاز ندارد.
 
 ۲. برنامه را باز کنید و در بخش «تنظیمات»، مسیرهای VS Code و Codex CLI (`Code.exe` و `codex.exe`) را بررسی کنید.
 
@@ -30,7 +30,7 @@
 
 ۵. برای تغییر حساب فعال، به صفحهٔ حساب‌ها بروید و «تعویض حساب» را بزنید. پیش از تعویض، کارهای جاری خود را ذخیره کنید.
 
-۶. برای کار هم‌زمان با چند حساب، «بازکردن VS Code» را انتخاب کنید. در اولین اجرا، برای نصب افزونهٔ رسمی Codex در محیط جدید باید به VS Code Marketplace دسترسی داشته باشید.
+۶. برای کار هم‌زمان با چند حساب، «بازکردن VS Code» را انتخاب کنید. پنجرهٔ VS Code ابتدا باز می‌شود و نصب افزونهٔ رسمی Codex سپس در پس‌زمینه تلاش می‌شود؛ اگر Marketplace یا نصب افزونه در دسترس نباشد، بازشدن VS Code متوقف نمی‌شود. برای نصب آفلاین، راهنمای [ساخت و نصب ویندوز](docs/BUILD-WINDOWS.md#codex-missing-from-an-accounts-vs-code-window) را ببینید.
 
 ## محدودیت مصرف و حریم خصوصی
 
@@ -38,11 +38,11 @@
 
 اطلاعات حساب‌های ذخیره‌شده با DPAPI حساب ویندوز رمزگذاری می‌شوند. فایل ورود حساب فعال برای استفادهٔ خود Codex روی رایانه باقی می‌ماند. این برنامه سرور ابری، آمارگیری یا ارسال اطلاعات ورود ندارد؛ خود Codex برای ورود و استفاده به اینترنت نیاز دارد.
 
-## وضعیت این پیش‌نمایش
+## وضعیت نسخهٔ منتشرشده
 
-خروجی‌های نسخهٔ پیش‌نمایش امضای دیجیتال ندارند و Windows SmartScreen ممکن است دربارهٔ ناشناخته‌بودن ناشر هشدار دهد. هش `SHA-256` فایل‌ها در [صفحهٔ نسخهٔ ۰٫۱٫۲](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.2) درج شده است.
+فایل‌های اجرایی امضای دیجیتال ندارند؛ بنابراین Windows SmartScreen ممکن است دربارهٔ ناشناخته‌بودن ناشر هشدار دهد. پیش از اجرا، هش `SHA-256` را در [صفحهٔ انتشار نسخهٔ ۰٫۱٫۳](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.3) بررسی کنید.
 
-تست‌های خودکار پروژه اجرا شده‌اند، اما تعویض کامل و واقعی بین دو حساب هنوز تأیید نشده است. پیش از استفاده از حساب‌های مهم، [گزارش اعتبارسنجی](docs/VALIDATION.md) و [سناریوهای پذیرش](tests/ACCEPTANCE.md) را بخوانید.
+نگه‌دارندهٔ پروژه تکمیل آزمون‌های پذیرش، از جمله تعویض حساب و بازکردن VS Code، را تأیید کرده است. برای جزئیات بیشتر، [گزارش اعتبارسنجی](docs/VALIDATION.md) را ببینید.
 
 ## ساخت از سورس
 

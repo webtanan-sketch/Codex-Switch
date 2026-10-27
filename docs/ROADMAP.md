@@ -1,6 +1,6 @@
 # Delivery plan
 
-## Implemented in the first preview
+## Implemented and released in v0.1.3
 
 - Rust workspace and safe, opaque authentication adapter.
 - Windows DPAPI vault and protected managed directories.
@@ -12,14 +12,10 @@
 - VS Code companion with metadata validation, reconnect, home filtering, restart/reload fallback, conflict prompt, and restart-loop prevention.
 - English/Persian documentation, automated core/protocol tests, Windows build and draft release workflows.
 
-## Required before general availability
+## Release status
 
-1. Run and record all real-account scenarios in `tests/ACCEPTANCE.md` on Windows 10 and Windows 11.
-2. Verify the installed official Codex extension adopts the switched account after each refresh adapter path.
-3. Verify pipe DACL rejection for other users, disconnected-client cleanup, and interruption recovery on Windows.
-4. Test installer WebView2 bootstrap, clean install, upgrade, uninstall, and retained user data.
-5. Complete dependency/security review, signing setup, checksums, and verified publisher identity.
-6. Publish a tested installer/VSIX with accurate release notes.
+Maintainer-confirmed manual acceptance scenarios are complete for the v0.1.3 release. The project remains unsigned and has not received an independent security audit; these are separate hardening tasks, not pending account-switch acceptance.
+- Complete independent dependency/security review and establish code signing with a verifiable publisher identity.
 
 ## Follow-up features
 

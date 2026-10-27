@@ -1,6 +1,6 @@
 {
   "name": "@codex-manager/workspace",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "description": "Windows Codex account manager and VS Code companion",
   "license": "Apache-2.0",

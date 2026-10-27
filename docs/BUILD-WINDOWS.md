@@ -80,7 +80,7 @@ npm run desktop:build -- --no-bundle
 
 Each account now uses an explicit extension directory:
 `%USERPROFILE%\.codex-hub\vscode-data\<profile-id>\extensions`.
-Before opening it, the manager installs the official `openai.chatgpt` extension with the CLI belonging to the selected Code.exe and that exact user-data/extension pair. The first setup needs Marketplace access; subsequent opens reuse the installed files. Failed setup shows an error instead of silently opening an unprepared environment. Existing account credentials and editor settings are preserved.
+After starting the editor window, the manager tries to install the official `openai.chatgpt` extension in that account's explicit extension directory. This is best-effort: Marketplace or extension-install failures do not prevent VS Code from opening. The first setup needs Marketplace access. Existing account credentials and editor settings are preserved.
 
 For an offline installation, obtain the official Codex VSIX on a connected computer and run the following in PowerShell, replacing the paths/UUID with your account's values. Close that account's VS Code windows first.
 
