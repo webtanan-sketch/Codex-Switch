@@ -10,7 +10,9 @@ A Windows desktop account manager with a VS Code companion. Save your ChatGPT si
 
 </div>
 
-> **Development preview — v0.1.1.** This repository contains the first working implementation and automated tests. A signed, generally available Windows installer and Marketplace listing have **not** been published. Do not interpret source availability or a successful build as completed real-account acceptance testing. See [validation status](docs/VALIDATION.md).
+**[Project page](https://webtanan-sketch.github.io/Codex-Switch/) · [Download Windows installer](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2-x64-setup.exe) · [Standalone EXE](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2.exe) · [Release details and SHA-256](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.2)**
+
+> **Windows preview — v0.1.2.** The installer and standalone executable are unsigned. Real switching between two accounts has not been fully validated; review the [validation status](docs/VALIDATION.md) and the release notes before use.
 >
 > An independent community project by Webtanan. Not affiliated with or endorsed by OpenAI or Microsoft.
 
@@ -40,17 +42,15 @@ The manager does not provide Codex access, a subscription, additional quota, or 
 
 ## Install and start
 
-### Preview builds
+### Preview build v0.1.2
 
-If a maintainer provides a tested build, obtain both artifacts from this repository's [GitHub Actions](https://github.com/webtanan-sketch/Codex-Switch/actions) or a future [Release](https://github.com/webtanan-sketch/Codex-Switch/releases):
+Download the [Windows x64 installer](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2-x64-setup.exe) or the [standalone EXE](https://github.com/webtanan-sketch/Codex-Switch/releases/download/v0.1.2/codex-account-manager-0.1.2.exe) from the [v0.1.2 release page](https://github.com/webtanan-sketch/Codex-Switch/releases/tag/v0.1.2). Verify the SHA-256 checksum listed there before running an unsigned preview build.
 
 1. Run the Windows NSIS installer (`*-setup.exe`). Unsigned development builds may trigger Windows SmartScreen; verify the source and checksum before installing.
 2. Start **Codex Account Manager** as your normal Windows user. Administrator access is not needed.
-3. In VS Code, open the Command Palette and run **Extensions: Install from VSIX…**. Select `codex-account-manager-0.1.0.vsix`.
+3. In VS Code, open the Command Palette and run **Extensions: Install from VSIX…**. Select the companion `.vsix` packaged with the source or build it using the instructions below.
 4. Install the official OpenAI Codex extension if it is not already installed.
 5. Open **Settings / تنظیمات** in the manager and review **System Check**.
-
-If no artifacts are available, [build from source](#build-from-source). This README does not promise a prebuilt download that does not yet exist.
 
 ### First-time setup
 
